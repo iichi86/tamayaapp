@@ -1,0 +1,11 @@
+node_modules/
+.expo/
+dist/
+dist-ios/
+.npm-cache/
+.expo-home/
+.expo-user/
+test-results/
+playwright-report/
+*.log
+.env*

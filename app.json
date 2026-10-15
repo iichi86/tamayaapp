@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "むさしの玉屋 会員アプリ",
+    "slug": "tamaya-members-demo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "jp.tamaya.members.demo"
+    },
+    "web": { "name": "むさしの玉屋 会員アプリ" },
+    "plugins": [["expo-camera", { "cameraPermission": "会員証のQRコードを読み取るためにカメラを使用します。", "recordAudioAndroid": false }]]
+  }
+}
