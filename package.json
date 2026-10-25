@@ -15,24 +15,24 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
-    "expo": "~54.0.37",
-    "expo-camera": "~17.0.10",
-    "expo-status-bar": "~3.0.9",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "react-native": "0.81.5",
+    "expo": "~57.0.31",
+    "expo-camera": "~57.0.6",
+    "expo-status-bar": "~57.0.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.3",
     "react-native-qrcode-svg": "^6.3.26",
-    "react-native-safe-area-context": "~5.6.0",
-    "react-native-svg": "15.12.1",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-svg": "15.15.4",
     "react-native-web": "~0.21.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.1",
     "@types/pngjs": "^6.0.5",
-    "@types/react": "~19.1.10",
+    "@types/react": "~19.2.2",
     "jsqr": "^1.4.0",
     "pngjs": "^7.0.0",
-    "typescript": "~5.9.2",
+    "typescript": "~6.0.3",
     "vitest": "^3.2.4"
   }
 }
