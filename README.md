@@ -13,33 +13,41 @@ React Native / Expo / TypeScript で作った、iPhone で操作できる会員�
 
 このデモの実行に API キー、外部データベース、有料サービス、Apple Developer Program の登録は不要です。App Store への公開や課金機能は含みません。
 
-**SDK は Expo 54 を使用します。** 2026 年 10 月 15 日（日本時間）に確認した公式資料では、App Store 版 Expo Go は SDK 54 に対応し、SDK 55 以降は配信されていません。iPhone で無料の App Store 版を使うため、この組み合わせを選んでいます。SDK 54 の iOS 最低バージョンは 15.1 です。Expo Go をインストールできる OS 条件は、お使いの iPhone の App Store 表示も確認してください。
+**SDK は Expo 57 を使用します。** 2026 年 10 月 25 日（日本時間）、利用者の iPhone で「インストール済みの Expo Go は SDK 57 用、プロジェクトは SDK 54」と表示されたため、プロジェクトを SDK 57 に更新しました。以前の「App Store 版 Expo Go は SDK 54 に対応する」という案内は、今回の端末には合っていませんでした。Expo Go の対応 SDK は変わるため、実際の端末の表示とプロジェクトのバージョンを照合してください。SDK 57 の最低 iOS バージョンは 16.4 です。Expo Go 自体のインストール条件は、お使いの iPhone の App Store 表示も確認してください。
 
-公式情報：[SDK 不一致の説明](https://docs.expo.dev/troubleshooting/expo-go-version-mismatch/)、[iPhone の同一アカウント要件](https://docs.expo.dev/troubleshooting/expo-go-sign-in-required/)。確認に使った[公式ドキュメントのソース](https://github.com/expo/expo/blob/main/docs/pages/troubleshooting/expo-go-version-mismatch.mdx)と [SDK 54 の iOS 設定](https://github.com/expo/expo/blob/sdk-54/packages/expo/Expo.podspec)。今後の Expo Go の変更に合わせて再確認してください。
+公式情報：[SDK 不一致の説明](https://docs.expo.dev/troubleshooting/expo-go-version-mismatch/)、[iPhone の同一アカウント要件](https://docs.expo.dev/troubleshooting/expo-go-sign-in-required/)。SDK を更新したことと、iPhone 実機でアプリの操作を確認したことは別です。実機での起動・カメラ・表示は、[iPhone 確認チェックリスト](docs/IPHONE.md)で確認してください。
 
 ## iPhone で起動する
 
-1. PC のターミナルを開き、この README が入っているフォルダーへ移動します。たとえば、フォルダー名が `tamayaapp` なら `cd tamayaapp` です。
+以前ダウンロードした SDK 54 版で不一致の画面が出た場合は、先に [Windows で SDK 54 版を更新する手順](docs/IPHONE.md#pc旧sdk-54版を更新する今回の不一致エラーが出た場合)を実行してください。ZIP 全体をダウンロード・展開し直す必要はありません。
+
+1. PC のターミナルを開き、この README が入っているフォルダーへ移動します。Windows で、これまでの手順どおりダウンロード・展開した場合は、黒い画面（コマンドプロンプト）に次の 1 行を貼り付けて Enter を押します。保存先を変えた場合は、`package.json` が入っている場所に読み替えます。
+
+   ```bat
+   cd /d "%USERPROFILE%\Downloads\tamayaapp-main\tamayaapp-main"
+   ```
+
 2. 次を 1 行ずつ実行します。`npm ci` は必要な部品を、付属のロックファイルと同じバージョンでインストールします。
 
    ```sh
    npm ci
    npx expo login
-   npm start
+   npm start -- --go --clear
    ```
 
 3. iPhone に Expo Go をインストールし、PC と同じ Expo アカウントでログインします。
-4. PC と iPhone を同じ Wi-Fi に接続します。iPhone の標準「カメラ」で、ターミナルに表示された **起動用 QR** を読み取り、Expo Go で開きます。ローカルネットワークへの接続を求められたら許可します。
-5. ターミナルを開いたまま操作します。終了するときは PC で `Ctrl + C` を押します。
+4. PC と iPhone を同じ Wi-Fi に接続します。PC に `Use port 8082 instead? (Y/n)` と表示された場合は、半角の `y` を入力して Enter を押します。起動後、**コマンドを入力した同じ黒い画面**に QR が表示されます。見えなくなった場合は、サーバーが動いている間に半角の `c` を 1 回押すと再表示できます。このとき Enter は不要です。
+5. iPhone の標準「カメラ」で、黒い画面の **起動用 QR** を読み取り、Expo Go で開きます。ローカルネットワークへの接続を求められたら許可します。
+6. ターミナルを開いたまま操作します。終了するときは PC で `Ctrl + C` を押します。
 
 起動用 QR は、アプリ内の **会員証 QR** とは別物です。スタッフ画面で読み取るのは会員証 QR です。
 
-`npm run ios` は **Mac と Xcode / iOS Simulator がある場合**のショートカットです。Windows / Linux から iPhone の Expo Go で試す場合は、上記の `npm start` を使います。
+`npm run ios` は **Mac と Xcode / iOS Simulator がある場合**のショートカットです。Windows / Linux から iPhone の Expo Go で試す場合は、上記の `npm start -- --go --clear` を使います。
 
 ### 開けないとき
 
 - アカウントのエラー：`npx expo whoami` で PC のアカウントを確認し、Expo Go と合わせます。ログイン後は端末の「Try Again」で再試行し、別アカウントへ変更した場合は `npm start` を起動し直します。
-- SDK のエラー：Expo Go とこのプロジェクトの SDK 54 が一致しているか確認します。SDK 55 以降へ単純に更新すると、App Store 版 Expo Go では開けません。
+- SDK のエラー：`Project is incompatible with this version of Expo Go` と表示された場合は、画面の「installed version」と「project」の SDK を確認します。この版は SDK 57 です。以前の SDK 54 版をダウンロードしていた場合は、PC 側のプロジェクトの更新が必要です。iPhone の Expo Go を削除したり、端末を初期化したりする必要はありません。
 - 接続待ち：同じ Wi-Fi、VPN、PC のファイアウォール、iPhone のローカルネットワーク許可を確認します。公共 Wi-Fi は端末間通信を禁止していることがあります。
 - LAN でつながらない場合：サーバーを止めて `npx expo start --tunnel` を試せます。追加ツールのインストール案内とインターネット接続が必要で、読み込みが遅くなることがあります。
 - 更新が反映されない場合：`npx expo start --clear` で開発サーバーのキャッシュを消して再起動します。これは会員データの初期化ではありません。
