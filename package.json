@@ -11,7 +11,11 @@
     "test": "vitest run",
     "test:browser": "playwright test",
     "export:web": "expo export --platform web",
-    "export:ios": "expo export --platform ios"
+    "export:ios": "expo export --platform ios",
+    "server:setup": "npm --prefix server ci",
+    "server:demo": "npm --prefix server run demo",
+    "server:test": "npm --prefix server test",
+    "server:test:browser": "playwright test --config server/playwright.config.ts"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",

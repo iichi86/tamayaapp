@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>むさしの玉屋｜管理サーバーの動作確認</title>
+  <style>
+    :root{--cream:#f5f2e9;--white:#fff;--ink:#292f2b;--green:#234c3a;--muted:#59665d;--line:#d7ddd6;--pale:#e8eee6;--red:#9a3030;--gold:#745a28}
+    *{box-sizing:border-box} [hidden]{display:none!important} body{margin:0;background:var(--cream);color:var(--ink);font-family:system-ui,-apple-system,"Yu Gothic",Meiryo,sans-serif;font-size:17px;line-height:1.7;overflow-wrap:anywhere} button,input,select,textarea{font:inherit} button,input,select,textarea{max-width:100%} button,input,select{min-height:48px} button{border:1px solid var(--green);border-radius:9px;background:var(--green);color:var(--white);padding:10px 17px;font-weight:650;cursor:pointer;line-height:1.45} button.secondary{background:var(--white);color:var(--green)} button.subtle{background:transparent;color:var(--green);border-color:var(--line)} button.danger{background:var(--white);border-color:var(--red);color:var(--red)} button:disabled{opacity:.55;cursor:not-allowed} button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid #92753e;outline-offset:3px} input,select,textarea{width:100%;border:1px solid #aab6ac;border-radius:8px;background:var(--white);color:var(--ink);padding:10px 12px} textarea{min-height:120px;resize:vertical} label{display:block;font-weight:650;margin-bottom:6px} h1,h2,h3,p{margin:0} h1{font-size:clamp(25px,5vw,36px);line-height:1.4;letter-spacing:.035em} h2{font-size:23px;line-height:1.5} h3{font-size:19px;line-height:1.5} a{color:var(--green)} small,.muted{color:var(--muted);font-size:15px} .wrap{max-width:1140px;margin:0 auto;padding:0 22px} header{padding:32px 0 25px;background:var(--white);border-bottom:1px solid var(--line)} .eyebrow{color:var(--green);font-size:14px;letter-spacing:.12em;margin-bottom:8px} .lead{margin-top:12px;max-width:780px;color:var(--muted)} main{padding-top:24px;padding-bottom:60px} .stack{display:grid;gap:16px}.panel{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:22px;min-width:0}.notice-banner{padding:16px 18px;background:var(--pale);border-left:4px solid var(--green);border-radius:8px}.notice-banner strong{display:block;margin-bottom:3px}.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}.toolbar{display:flex;gap:12px;align-items:end;flex-wrap:wrap}.toolbar>div{flex:1 1 290px}.toolbar>button{flex:0 1 auto}.status{padding:13px 16px;border-radius:8px;background:var(--pale);border:1px solid #c5d4c3;white-space:pre-wrap}.error{padding:13px 16px;border:1px solid #d9abab;border-radius:8px;background:#fff2ef;color:#792222;white-space:pre-wrap}.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{display:inline-block;padding:3px 10px;border-radius:99px;font-size:14px;border:1px solid var(--line);background:var(--cream)}.chip.green{color:var(--green);background:var(--pale);border-color:#bfd0bc}.chip.expired{color:var(--red);background:#fff2ef}.balance{font-size:39px;line-height:1.3;color:var(--green);font-weight:750}.balance span{font-size:17px;font-weight:500}.divider{border-top:1px solid var(--line);padding-top:16px}.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.metric{background:var(--pale);padding:13px 8px;text-align:center;border-radius:9px}.metric strong{display:block;font-size:27px;line-height:1.3}.metric span{display:block;font-size:14px;line-height:1.5;margin-top:4px}.list{display:grid;gap:11px}.list-card{border:1px solid var(--line);border-radius:10px;padding:15px;display:grid;gap:10px;min-width:0}.member-button{width:100%;text-align:left;background:var(--white);color:var(--ink);border-color:var(--line);font-weight:500;display:grid;gap:3px}.member-button[aria-pressed=true]{background:var(--pale);border:2px solid var(--green)}.member-button strong{font-weight:700}.coupon-amount{font-size:26px;font-weight:750;color:var(--green)} .row{display:flex;gap:10px;justify-content:space-between;align-items:start;flex-wrap:wrap}.grow{flex:1}.fine{font-size:14px;color:var(--muted)}.id{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px;word-break:break-all}.history{margin:0;padding-left:1.5em}.history li{padding:4px 0}.heading-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.flow{padding:16px;background:var(--cream);border-radius:8px}.flow ol{margin:5px 0 0;padding-left:1.5em}.flow li{padding:3px 0}.checklist{margin:0;padding-left:1.5em}.checklist li{padding:4px 0}.inline-actions{display:flex;gap:10px;flex-wrap:wrap}.inline-actions>*{flex:1 1 160px}footer{border-top:1px solid var(--line);padding-top:20px;margin-top:10px}
+    @media(max-width:760px){.layout{grid-template-columns:minmax(0,1fr)}.wrap{padding-left:15px;padding-right:15px}header{padding-top:24px}.panel{padding:17px}.toolbar>button{width:100%}.toolbar>div{flex-basis:100%}.balance{font-size:35px}}@media(max-width:350px){.metrics{grid-template-columns:minmax(0,1fr)}.metric{display:flex;gap:12px;align-items:center;text-align:left;padding:10px 13px}.metric span{margin:0}.panel{padding:14px}.wrap{padding-left:11px;padding-right:11px}}
+  </style>
+</head>
+<body>
+  <header><div class="wrap"><p class="eyebrow">管理サーバーの動作確認</p><h1>むさしの玉屋</h1><p class="lead">会員登録、店舗でのスタンプ付与、特典利用を、サーバーに保存しながら試せます。</p></div></header>
+  <main class="wrap stack">
+    <div class="notice-banner"><strong>開発用・架空データ</strong><p>この画面の利用者切り替えは動作確認用です。本番のログインではありません。実在のお客様の情報は入力しないでください。</p></div>
+    <section class="panel stack" aria-labelledby="session-heading">
+      <h2 id="session-heading">操作する利用者を選ぶ</h2>
+      <div class="toolbar"><div><label for="session">確認用の利用者</label><select id="session" data-lock><option value="demo-owner">店舗管理者（スタッフ管理も可能）</option><option value="demo-staff">店舗スタッフ</option><option value="demo-customer">お客さん：体験用の会員（9スタンプ開始）</option><option value="demo-new-customer">お客さん：新規登録を試す</option></select></div><button id="refresh" class="secondary" data-lock>最新の状態を取得</button></div>
+      <p class="muted" id="session-description"></p><p class="fine">同じサーバーを見ているため、利用者を切り替えても付与・利用の結果を確認できます。保存先は、このサーバーのデータベースです。</p>
+    </section>
+    <div id="message" class="status" role="status" aria-live="polite" hidden></div>
+    <div id="error" class="error" role="alert" hidden></div>
+
+    <section id="customer-panel" class="panel stack" aria-labelledby="customer-heading" hidden>
+      <div class="heading-row"><h2 id="customer-heading">お客さんの会員情報</h2><span class="chip green">お客さん用</span></div>
+      <form id="register-form" class="stack" hidden><p>ニックネームを登録すると、0スタンプから始まります。</p><div><label for="nickname">ニックネーム（1〜20文字）</label><input id="nickname" name="nickname" maxlength="20" autocomplete="off" placeholder="例：たまやテスト" required data-lock></div><button type="submit" data-lock>会員登録する</button></form>
+      <div id="customer-member" class="stack" hidden></div>
+    </section>
+
+    <div id="staff-panel" class="layout" hidden>
+      <div class="stack">
+        <section class="panel stack" aria-labelledby="stats-heading"><div class="heading-row"><h2 id="stats-heading">本日の記録</h2><span class="chip green">日本時間</span></div><div id="stats" class="metrics"></div><p class="fine">集計はサーバーの保存記録をもとにしています。</p></section>
+        <section class="panel stack" aria-labelledby="members-heading"><h2 id="members-heading">確認する会員を選ぶ</h2><form id="search-form" class="stack"><div><label for="member-query">会員番号・ニックネーム</label><input id="member-query" autocomplete="off" maxlength="80" placeholder="空欄で検索すると最大20名を表示" data-lock></div><button type="submit" class="secondary" data-lock>会員を検索する</button></form><div id="members" class="list"></div></section>
+        <section id="owner-panel" class="panel stack" aria-labelledby="accounts-heading" hidden><h2 id="accounts-heading">スタッフの利用管理</h2><p class="fine">管理者だけが操作できます。停止したスタッフは、サーバーへの業務操作を拒否されます。</p><div id="accounts" class="list"></div></section>
+      </div>
+      <section class="panel stack" aria-labelledby="target-heading"><h2 id="target-heading">対象会員を確認する</h2><p id="target-empty" class="muted">会員を選択すると、名前・残高・クーポンを確認できます。</p><div id="target-member" class="stack" hidden></div></section>
+    </div>
+
+    <section class="panel stack" aria-labelledby="notices-heading"><h2 id="notices-heading">お知らせ</h2><div id="notices" class="list"></div><form id="notice-form" class="stack divider" hidden><h3 id="notice-form-heading">お知らせを追加する</h3><input id="notice-id" type="hidden"><div><label for="notice-title">タイトル（80文字まで）</label><input id="notice-title" maxlength="80" required data-lock></div><div><label for="notice-body">本文（1,000文字まで）</label><textarea id="notice-body" maxlength="1000" required data-lock></textarea></div><div class="inline-actions"><button type="submit" id="save-notice" data-lock>お知らせを保存する</button><button type="button" id="cancel-notice" class="secondary" data-lock>入力をクリア</button></div></form></section>
+    <section class="panel stack" aria-labelledby="flow-heading"><h2 id="flow-heading">最初に試す順番</h2><div class="flow"><ol><li>店舗管理者で、9スタンプ開始の体験用会員を選びます。</li><li>名前を確認し、スタンプを1個付与します。</li><li>残高0個・新しい未使用クーポン1枚を確認します。</li><li>お客さんへ切り替え、同じ結果を確認します。</li><li>店舗管理者へ戻り、そのクーポンを使用済みにします。</li></ol></div><p class="fine">付与は同じ会員に日本時間で1日1回までです。10個で100円引きクーポンを発行し、10個を消費します。有効期間は30日です。いずれも試作用の条件です。</p></section>
+    <footer class="stack"><p class="fine">この画面は管理サーバーを確認するためのものです。既存のExpo会員アプリは、まだこのサーバーへ接続していません。本番のFirebaseログイン・インターネットへの配置・実店舗での利用は別途確認が必要です。</p></footer>
+  </main>
+  <script>
+    'use strict';
+    const base = '/api/stores/tamaya';
+    const $ = (id) => document.getElementById(id);
+    const state = { token: 'demo-owner', busy: false, selectedMemberId: null, selectedMember: null, notices: [], members: [], mutationKeys: new Map() };
+    const labels = { available: '未使用', used: '使用済み', expired: '期限切れ' };
+    const descriptions = { 'demo-owner': '店舗管理者として、付与・特典利用・お知らせ編集・スタッフ管理を試します。', 'demo-staff': '店舗スタッフとして、付与・特典利用・お知らせ編集を試します。', 'demo-customer': 'お客さんとして、自分の会員情報・スタンプ・クーポンを確認します。', 'demo-new-customer': '新しいお客さんとして、ニックネーム登録と0スタンプ開始を試します。' };
+    const isStaff = () => state.token === 'demo-owner' || state.token === 'demo-staff';
+    const isOwner = () => state.token === 'demo-owner';
+    const element = (tag, className, text) => { const item = document.createElement(tag); if (className) item.className = className; if (text !== undefined) item.textContent = text; return item; };
+    const date = (value) => { const parsed = new Date(value); return Number.isNaN(parsed.getTime()) ? '日時を確認してください' : parsed.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }); };
+    const money = (value) => new Intl.NumberFormat('ja-JP').format(value);
+    function message(text) { $('message').textContent = text; $('message').hidden = !text; }
+    function showError(error) { $('error').textContent = error.message || '操作を完了できませんでした。'; $('error').hidden = false; }
+    function clearError() { $('error').hidden = true; $('error').textContent = ''; }
+    function setBusy(value) { state.busy = value; document.querySelectorAll('[data-lock]').forEach((item) => { item.disabled = value; }); document.body.setAttribute('aria-busy', String(value)); }
+    async function request(path, options = {}) {
+      const method = options.method || 'GET';
+      const headers = { Authorization: `Bearer ${state.token}` };
+      if (options.body !== undefined) headers['Content-Type'] = 'application/json';
+      const signature = `${state.token}|${method}|${path}|${JSON.stringify(options.body)}`;
+      if (options.mutation) {
+        if (!state.mutationKeys.has(signature)) state.mutationKeys.set(signature, crypto.randomUUID());
+        headers['Idempotency-Key'] = state.mutationKeys.get(signature);
+      }
+      let response;
+      try { response = await fetch(path, { method, headers, body: options.body === undefined ? undefined : JSON.stringify(options.body), cache: 'no-store' }); }
+      catch { throw new Error('通信結果を確認できませんでした。「最新の状態を取得」で結果を確認してください。同じ操作の再試行には同じ処理番号を使います。'); }
+      let data;
+      try { data = await response.json(); }
+      catch { throw new Error('サーバーからの結果を読み取れませんでした。最新の状態を確認してください。'); }
+      if (options.mutation && (response.ok || [400, 404, 409, 422].includes(response.status))) state.mutationKeys.delete(signature);
+      if (!response.ok) { const failure = new Error(data.error?.message || '操作を完了できませんでした。'); failure.status = response.status; failure.code = data.error?.code; throw failure; }
+      return data;
+    }
+    async function run(action) { if (state.busy) return; clearError(); message(''); setBusy(true); try { await action(); } catch (error) { showError(error); } finally { setBusy(false); } }
+    function actionButton(text, action, className = 'secondary') { const button = element('button', className, text); button.type = 'button'; button.setAttribute('data-lock', ''); button.disabled = state.busy; button.addEventListener('click', () => run(action)); return button; }
+    function empty(container, text) { container.replaceChildren(element('p', 'muted', text)); }
+    function couponCard(coupon, staff) {
+      const card = element('div', 'list-card');
+      const row = element('div', 'row'); row.append(element('span', 'coupon-amount', `${money(coupon.discountYen)}円引き`), element('span', `chip ${coupon.status === 'available' ? 'green' : coupon.status === 'expired' ? 'expired' : ''}`, labels[coupon.status] || '状態を確認'));
+      card.append(row, element('p', 'fine', `有効期限：${date(coupon.expiresAt)}`), element('p', 'id', `特典番号：${coupon.id}`));
+      if (coupon.usedAt) card.append(element('p', 'fine', `使用日：${date(coupon.usedAt)}`));
+      if (staff && coupon.status === 'available') card.append(actionButton('特典利用を確認する', async () => {
+        if (!confirm(`${state.selectedMember.nickname}さんの「${money(coupon.discountYen)}円引き」を使用済みにしますか？\n特典番号：${coupon.id}`)) return;
+        const result = await request(`${base}/staff/coupons/${encodeURIComponent(coupon.id)}/redeem`, { method: 'POST', body: {}, mutation: true });
+        state.selectedMember = result.member; renderMember($('target-member'), result.member, true); await refreshStaffSummary(); message('クーポンを使用済みにしました。お客さんへ切り替えても確認できます。');
+      }));
+      if (staff && coupon.status !== 'available') card.append(element('p', 'fine', 'このクーポンは利用できません。'));
+      return card;
+    }
+    function renderMember(container, member, staff) {
+      container.hidden = false; container.replaceChildren();
+      const intro = element('div', 'stack'); intro.append(element('h3', '', `${member.nickname}さん`), element('p', 'fine', `会員番号：${member.number}`));
+      const balance = element('p', 'balance', String(member.stamps)); balance.append(element('span', '', ' スタンプ')); intro.append(balance); container.append(intro);
+      if (staff) container.append(actionButton('スタンプ付与を確認する', async () => {
+        if (!confirm(`${member.nickname}さん（会員番号 ${member.number}）へ、来店スタンプを1個付与しますか？`)) return;
+        const result = await request(`${base}/staff/members/${encodeURIComponent(member.id)}/stamps`, { method: 'POST', body: {}, mutation: true });
+        state.selectedMember = result.member; renderMember(container, result.member, true); await refreshStaffSummary(); message(result.coupon ? `1スタンプ付与し、${money(result.coupon.discountYen)}円引きクーポンを1枚発行しました。スタンプ残高は${result.member.stamps}個です。` : 'スタンプを1個付与しました。');
+      }, ''));
+      const coupons = element('div', 'stack divider'); coupons.append(element('h3', '', 'クーポン'));
+      if (member.coupons.length) member.coupons.slice().sort((a, b) => b.issuedAt.localeCompare(a.issuedAt)).forEach((coupon) => coupons.append(couponCard(coupon, staff)));
+      else coupons.append(element('p', 'muted', 'まだクーポンはありません。'));
+      container.append(coupons);
+      const history = element('div', 'stack divider'); history.append(element('h3', '', 'スタンプ付与履歴'));
+      if (member.stampHistory.length) { const list = element('ul', 'history'); member.stampHistory.slice(0, 20).forEach((stamp) => list.append(element('li', 'fine', `${date(stamp.createdAt)}　1スタンプ`))); history.append(list); }
+      else history.append(element('p', 'muted', '付与履歴はありません。'));
+      container.append(history);
+    }
+    async function loadCustomer() {
+      $('customer-member').replaceChildren(); $('customer-member').hidden = true; $('register-form').hidden = true;
+      try { const member = await request(`${base}/me`); renderMember($('customer-member'), member, false); }
+      catch (error) { if (error.status === 404) $('register-form').hidden = false; else throw error; }
+    }
+    function renderMembers(members) {
+      $('members').replaceChildren();
+      if (!members.length) { empty($('members'), '条件に合う会員は見つかりませんでした。'); return; }
+      members.forEach((member) => {
+        const button = actionButton('', async () => { state.selectedMemberId = member.id; await loadTarget(); renderMembers(state.members); }, 'member-button');
+        button.setAttribute('aria-pressed', String(state.selectedMemberId === member.id)); button.append(element('strong', '', `${member.nickname}さん`), element('span', 'fine', `会員番号 ${member.number} ／ ${member.stamps}スタンプ`)); $('members').append(button);
+      });
+    }
+    async function loadTarget() { if (!state.selectedMemberId) return; const member = await request(`${base}/staff/members/${encodeURIComponent(state.selectedMemberId)}`); state.selectedMember = member; $('target-empty').hidden = true; renderMember($('target-member'), member, true); }
+    async function refreshStaffSummary() {
+      const [stats, members] = await Promise.all([request(`${base}/staff/stats`), request(`${base}/staff/members?query=${encodeURIComponent($('member-query').value.trim())}`)]);
+      $('stats').replaceChildren(); [['会員数', stats.members], ['本日の付与', stats.stampsToday], ['本日の特典利用', stats.redemptionsToday]].forEach(([label, value]) => { const item = element('div', 'metric'); item.append(element('strong', '', String(value)), element('span', '', label)); $('stats').append(item); });
+      state.members = members; renderMembers(members);
+    }
+    async function loadAccounts() {
+      if (!isOwner()) return; const accounts = await request(`${base}/staff/accounts`); $('accounts').replaceChildren();
+      accounts.forEach((account) => {
+        const card = element('div', 'list-card'); const name = account.uid === 'demo-owner' ? '店舗管理者' : account.uid === 'demo-staff' ? '店舗スタッフ' : account.uid;
+        card.append(element('strong', '', name), element('p', 'fine', `${account.role === 'owner' ? '管理者' : 'スタッフ'} ／ ${account.active ? '利用中' : '停止中'}`));
+        if (account.uid !== 'demo-owner') card.append(actionButton(account.active ? 'このスタッフを停止する' : 'このスタッフを再開する', async () => {
+          if (!confirm(`${name}の利用を${account.active ? '停止' : '再開'}しますか？`)) return;
+          await request(`${base}/staff/accounts/${encodeURIComponent(account.uid)}`, { method: 'PUT', body: { role: account.role, active: !account.active }, mutation: true }); await loadAccounts(); message(`スタッフの利用を${account.active ? '停止' : '再開'}しました。`);
+        }, account.active ? 'danger' : 'secondary'));
+        $('accounts').append(card);
+      });
+    }
+    function clearNoticeForm() { $('notice-id').value = ''; $('notice-title').value = ''; $('notice-body').value = ''; $('notice-form-heading').textContent = 'お知らせを追加する'; }
+    async function loadNotices() {
+      state.notices = await request(`${base}/notices`); $('notices').replaceChildren();
+      if (!state.notices.length) { empty($('notices'), 'お知らせはまだありません。'); return; }
+      state.notices.forEach((notice) => {
+        const card = element('article', 'list-card'); const body = element('p', '', notice.body); body.style.whiteSpace = 'pre-wrap'; card.append(element('h3', '', notice.title), body, element('p', 'fine', `更新：${date(notice.updatedAt)}`));
+        if (isStaff()) card.append(actionButton('このお知らせを編集する', async () => { $('notice-id').value = notice.id; $('notice-title').value = notice.title; $('notice-body').value = notice.body; $('notice-form-heading').textContent = 'お知らせを編集する'; $('notice-form').scrollIntoView({ behavior: 'smooth', block: 'center' }); $('notice-title').focus(); }));
+        $('notices').append(card);
+      });
+    }
+    async function refresh() {
+      $('session-description').textContent = descriptions[state.token]; $('customer-panel').hidden = isStaff(); $('staff-panel').hidden = !isStaff(); $('owner-panel').hidden = !isOwner(); $('notice-form').hidden = !isStaff();
+      if (isStaff()) { await refreshStaffSummary(); await loadTarget(); await loadAccounts(); } else await loadCustomer();
+      await loadNotices();
+    }
+    $('session').addEventListener('change', () => run(async () => { state.token = $('session').value; state.selectedMemberId = null; state.selectedMember = null; $('target-member').replaceChildren(); $('target-member').hidden = true; $('target-empty').hidden = false; $('member-query').value = ''; $('members').replaceChildren(); $('stats').replaceChildren(); $('accounts').replaceChildren(); $('notices').replaceChildren(); clearNoticeForm(); await refresh(); message('利用者を切り替え、最新の保存内容を取得しました。'); }));
+    $('refresh').addEventListener('click', () => run(async () => { await refresh(); message('最新の保存内容を取得しました。'); }));
+    $('search-form').addEventListener('submit', (event) => { event.preventDefault(); run(refreshStaffSummary); });
+    $('register-form').addEventListener('submit', (event) => { event.preventDefault(); run(async () => { const nickname = $('nickname').value.trim(); if (!nickname || nickname.length > 20) throw new Error('ニックネームを1〜20文字で入力してください。'); await request(`${base}/memberships`, { method: 'POST', body: { nickname } }); await loadCustomer(); message('会員登録が完了しました。0スタンプからの開始です。'); }); });
+    $('notice-form').addEventListener('submit', (event) => { event.preventDefault(); run(async () => { const id = $('notice-id').value; const title = $('notice-title').value.trim(); const body = $('notice-body').value.trim(); if (!title || !body) throw new Error('タイトルと本文を入力してください。'); await request(`${base}/staff/notices${id ? `/${encodeURIComponent(id)}` : ''}`, { method: id ? 'PUT' : 'POST', body: { title, body }, mutation: true }); clearNoticeForm(); await loadNotices(); message('お知らせを保存しました。お客さんへ切り替えると確認できます。'); }); });
+    $('cancel-notice').addEventListener('click', () => { clearNoticeForm(); clearError(); message('お知らせの入力をクリアしました。保存内容は変更していません。'); });
+    run(refresh);
+  </script>
+</body>
+</html>

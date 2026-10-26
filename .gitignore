@@ -9,3 +9,9 @@ test-results/
 playwright-report/
 *.log
 .env*
+!server/.env.example
+server/data/
+server/dist/
+**/*service-account*.json
+**/firebase-admin*.json
+**/*firebase-adminsdk*.json
