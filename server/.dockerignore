@@ -1,0 +1,7 @@
+node_modules
+.npm-cache
+.env*
+data
+dist
+*service-account*.json
+*firebase-admin*.json

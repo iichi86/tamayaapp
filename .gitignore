@@ -7,11 +7,17 @@ dist-ios/
 .expo-user/
 test-results/
 playwright-report/
+playwright-report-production/
 *.log
 .env*
+!.env.example
 !server/.env.example
+!server/.env.production.example
 server/data/
 server/dist/
 **/*service-account*.json
 **/firebase-admin*.json
 **/*firebase-adminsdk*.json
+local-data/
+.firebase/
+server/secrets/

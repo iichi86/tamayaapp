@@ -1,3 +1,5 @@
+> **本番接続版を追加しました。** このページの従来のSQLiteデモと、本番用のPostgreSQL版は別です。Firebase＋Supabaseの準備・本番起動・初回オーナー登録は[本番引継ぎ手順](../docs/PRODUCTION_HANDOVER.md)へ進んでください。本番用の入口は `npm run production:dev`、ビルド後は `npm run production`、DB準備は `npm run db:migrate` と `npm run db:provision` です。以下の `npm run demo` は以前の架空データのデモです。
+
 # 玉屋 管理サーバー
 
 会員・スタッフ・スタンプ・クーポン・お知らせを管理するAPIサーバーです。Node.js、Fastify、SQLiteを使用します。Firebase Authenticationで発行されたIDトークンを検証し、スタッフの権限と付与・使用条件はサーバー側で確認します。

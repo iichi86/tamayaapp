@@ -35,6 +35,7 @@ export default defineConfig({
     timeout: 120_000,
     env: {
       EXPO_OFFLINE: '1',
+      EXPO_PUBLIC_APP_MODE: 'demo',
       EXPO_NO_TELEMETRY: '1',
       __UNSAFE_EXPO_HOME_DIRECTORY: resolve(process.cwd(), '.expo-user'),
     },

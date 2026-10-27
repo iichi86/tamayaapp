@@ -32,14 +32,13 @@ export function Scanner({
           label="カメラの使用を許可"
           disabled={permission?.canAskAgain === false}
           onPress={() => {
-            void requestPermission().catch(() => setError('iPhoneの設定でカメラの許可を確認してください。デモ会員の選択でも操作を試せます。'));
+            void requestPermission().catch(() => setError('iPhoneの設定でカメラの許可を確認してください。会員番号の検索でも確認できます。'));
           }}
         />
         <Button label="閉じる" onPress={onClose} variant="secondary" />
         {permission && !permission.canAskAgain && (
           <Muted>
-            許可できない場合は、iPhoneの「設定」からExpo
-            Goのカメラを許可してください。
+            許可できない場合は、iPhoneの「設定」からこのアプリのカメラを許可してください。Expo Goで開いている場合はExpo Goを選びます。
           </Muted>
         )}
       </Card>
@@ -51,7 +50,7 @@ export function Scanner({
         <CameraView
           style={StyleSheet.absoluteFill}
           facing="back"
-          onMountError={() => setError('カメラを使用できません。ほかのアプリを閉じてお試しください。デモ会員の選択でも操作できます。')}
+          onMountError={() => setError('カメラを使用できません。ほかのアプリを閉じてお試しください。会員番号の検索でも確認できます。')}
           barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
           onBarcodeScanned={({ data }) => {
             if (!captured.current) {

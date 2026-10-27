@@ -1,0 +1,34 @@
+# Deploy only after the owner has created/approved the cloud accounts.
+# The source repository root is the Docker build context.
+services:
+  - type: web
+    name: tamaya-members-api
+    runtime: docker
+    dockerfilePath: ./server/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeployTrigger: "off"
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: AUTH_MODE
+        value: firebase
+      - key: HOST
+        value: 0.0.0.0
+      - key: TRUST_PROXY_HOPS
+        value: "1"
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: QR_SIGNING_SECRET
+        generateValue: true
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        value: /etc/secrets/firebase-admin.json
+# Verify Render uses exactly one trusted reverse-proxy hop before enabling TRUST_PROXY_HOPS=1.
+# Add firebase-admin.json using Render Secret Files; do not add it to GitHub.
+# Render plan/fees are chosen by the account owner. This file creates no contract itself.
