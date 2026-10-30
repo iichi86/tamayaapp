@@ -1,5 +1,7 @@
 # 現在の検証結果（本番接続版）
 
+2026年10月30日追記：所有者から受け取ったFirebase Webアプリの公開設定4項目を設定例と作業環境の非公開`.env`へ保存し、サーバー側のプロジェクトIDを`tamayaapp`へ合わせました。書式・値の一致、未定の管理API URLが空欄であること、`.env`がGit対象外であること、差分形式を確認しました。配布前チェックはFirebase公開設定の不足を解消し、残りのAPI URL等を検出しています。実Firebaseへのログインは未検証です。今回の再開環境には依存ライブラリが未導入で`tsc`が見つからず、型検査は再実行できていません。TypeScriptソースの変更はありません。
+
 確認日：2026年10月27日（日本時間）。Linux / Node.js 24.19.0 / Expo 57.0.31 / React Native 0.86.3 / React 19.2.3 / Firebase JS SDK 12.19.0 / Firebase Admin 14.5.0 / PostgreSQL 17 / Vitest 5.0.5。
 
 **本番用ソースとローカル連携の確認結果です。実際のFirebase・Supabase・常設ホスティングは未作成・未接続です。この版のiPhone実機・iOS Simulator・署名付きビルド・TestFlight確認は行っていません。** 以前の端末内デモのiPhone確認報告とは区別しています。
