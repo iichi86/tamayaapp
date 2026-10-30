@@ -4,10 +4,14 @@ import type { StoreInfo } from '../../../shared/contracts.js';
 
 export class ProductionConfigurationError extends Error {}
 
-export interface ProductionConfig {
-  environment: 'local' | 'production'; authMode: 'firebase' | 'emulator';
-  host: string; port: number; projectId: string; qrSecret: string; databaseUrl: string;
+interface DatabaseConnectionConfig {
+  databaseUrl: string;
   databaseSsl: false | { rejectUnauthorized: true; ca?: string };
+}
+
+export interface ProductionConfig extends DatabaseConnectionConfig {
+  environment: 'local' | 'production'; authMode: 'firebase' | 'emulator';
+  host: string; port: number; projectId: string; qrSecret: string;
   allowedOrigins: string[]; publicBaseUrl: string | null; storePath: string;
   emulatorHost?: string; trustProxyHops: number;
 }
@@ -18,14 +22,40 @@ export function loadProductionEnvironment(): void {
   if (existsSync(path)) process.loadEnvFile(path);
 }
 
+function configuredEnvironment(env: NodeJS.ProcessEnv): ProductionConfig['environment'] {
+  const environment = env.APP_ENV ?? 'production';
+  if (environment !== 'local' && environment !== 'production') throw new ProductionConfigurationError('APP_ENVはlocalかproductionを指定してください。');
+  return environment;
+}
+
+function databaseConnectionConfig(env: NodeJS.ProcessEnv, environment: ProductionConfig['environment']): DatabaseConnectionConfig {
+  let database: URL;
+  try { database = new URL(env.DATABASE_URL?.trim() ?? ''); }
+  catch { throw new ProductionConfigurationError('DATABASE_URLにPostgreSQLの接続情報を設定してください。'); }
+  if (!['postgres:', 'postgresql:'].includes(database.protocol) || !database.hostname || !database.pathname.slice(1)) {
+    throw new ProductionConfigurationError('DATABASE_URLにPostgreSQLの接続情報を設定してください。');
+  }
+  const localDb = ['127.0.0.1', 'localhost', '[::1]'].includes(database.hostname);
+  if (environment === 'production' && localDb) throw new ProductionConfigurationError('本番用DATABASE_URLに共有データベースの接続先を指定してください。');
+  // pg URL SSL parameters may silently replace the secure Pool.ssl object; remove them.
+  for (const key of ['ssl', 'sslmode', 'sslcert', 'sslkey', 'sslrootcert', 'sslnegotiation', 'uselibpqcompat']) database.searchParams.delete(key);
+  const databaseSsl = environment === 'local' && localDb
+    ? false as const : { rejectUnauthorized: true as const, ...(env.DATABASE_CA_PATH ? { ca: readFileSync(env.DATABASE_CA_PATH, 'utf8') } : {}) };
+  return { databaseUrl: database.toString(), databaseSsl };
+}
+
+/** Owner-run database setup does not require an HTTP server or Firebase configuration. */
+export function databaseSetupConfig(env: NodeJS.ProcessEnv = process.env): DatabaseConnectionConfig {
+  return databaseConnectionConfig({ ...env, DATABASE_URL: env.DATABASE_MIGRATION_URL?.trim() || env.DATABASE_URL }, configuredEnvironment(env));
+}
+
 export function productionConfig(env: NodeJS.ProcessEnv = process.env): ProductionConfig {
   const required = (name: string): string => {
     const value = env[name]?.trim();
     if (!value) throw new ProductionConfigurationError(`${name}が未設定です。本番設定を確認してください。`);
     return value;
   };
-  const environment = env.APP_ENV ?? 'production';
-  if (environment !== 'local' && environment !== 'production') throw new ProductionConfigurationError('APP_ENVはlocalかproductionを指定してください。');
+  const environment = configuredEnvironment(env);
   const authMode = env.AUTH_MODE ?? 'firebase';
   if (authMode !== 'firebase' && authMode !== 'emulator') throw new ProductionConfigurationError('AUTH_MODEが正しくありません。');
   const host = env.HOST ?? (environment === 'local' ? '127.0.0.1' : '0.0.0.0');
@@ -49,18 +79,7 @@ export function productionConfig(env: NodeJS.ProcessEnv = process.env): Producti
   } else if (emulatorHost) {
     throw new ProductionConfigurationError('本番認証ではFIREBASE_AUTH_EMULATOR_HOSTを設定しないでください。');
   }
-  let database: URL;
-  try { database = new URL(required('DATABASE_URL')); }
-  catch { throw new ProductionConfigurationError('DATABASE_URLにPostgreSQLの接続情報を設定してください。'); }
-  if (!['postgres:', 'postgresql:'].includes(database.protocol) || !database.hostname || !database.pathname.slice(1)) {
-    throw new ProductionConfigurationError('DATABASE_URLにPostgreSQLの接続情報を設定してください。');
-  }
-  const localDb = ['127.0.0.1', 'localhost', '[::1]'].includes(database.hostname);
-  if (environment === 'production' && localDb) throw new ProductionConfigurationError('本番用DATABASE_URLに共有データベースの接続先を指定してください。');
-  // pg URL SSL parameters may silently replace the secure Pool.ssl object; remove them.
-  for (const key of ['ssl', 'sslmode', 'sslcert', 'sslkey', 'sslrootcert', 'sslnegotiation', 'uselibpqcompat']) database.searchParams.delete(key);
-  const databaseSsl = environment === 'local' && localDb
-    ? false as const : { rejectUnauthorized: true as const, ...(env.DATABASE_CA_PATH ? { ca: readFileSync(env.DATABASE_CA_PATH, 'utf8') } : {}) };
+  const database = databaseConnectionConfig(env, environment);
   const allowedOrigins = (env.CORS_ORIGINS ?? '').split(',').map((value) => value.trim()).filter(Boolean);
   for (const origin of allowedOrigins) {
     let url: URL;
@@ -70,17 +89,20 @@ export function productionConfig(env: NodeJS.ProcessEnv = process.env): Producti
     }
   }
   let publicBaseUrl: string | null = null;
-  if (env.PUBLIC_BASE_URL) {
-    const url = new URL(env.PUBLIC_BASE_URL);
-    if (url.origin !== env.PUBLIC_BASE_URL || (environment === 'production' && url.protocol !== 'https:')) {
+  const publicBaseValue = env.PUBLIC_BASE_URL?.trim() ? env.PUBLIC_BASE_URL : env.RENDER_EXTERNAL_URL;
+  if (publicBaseValue?.trim()) {
+    let url: URL;
+    try { url = new URL(publicBaseValue); }
+    catch { throw new ProductionConfigurationError('PUBLIC_BASE_URLには管理サーバーのHTTPSオリジンを指定してください。'); }
+    if (url.origin !== publicBaseValue || (environment === 'production' && url.protocol !== 'https:')) {
       throw new ProductionConfigurationError('PUBLIC_BASE_URLには管理サーバーのHTTPSオリジンを指定してください。');
     }
     publicBaseUrl = url.origin;
   }
   if (environment === 'production' && !publicBaseUrl) throw new ProductionConfigurationError('本番運用にはPUBLIC_BASE_URLが必要です。');
   return {
-    environment, authMode, host, port, projectId, qrSecret, databaseUrl: database.toString(),
-    databaseSsl, allowedOrigins, publicBaseUrl, emulatorHost, trustProxyHops,
+    environment, authMode, host, port, projectId, qrSecret, ...database,
+    allowedOrigins, publicBaseUrl, emulatorHost, trustProxyHops,
     storePath: resolve(env.STORE_CONFIG_PATH ?? 'config/tamaya.json'),
   };
 }

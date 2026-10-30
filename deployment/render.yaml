@@ -4,6 +4,8 @@ services:
   - type: web
     name: tamaya-members-api
     runtime: docker
+    # Preparation/testing plan. Review always-on hosting before store operation.
+    plan: free
     dockerfilePath: ./server/Dockerfile
     dockerContext: .
     healthCheckPath: /health
@@ -18,17 +20,16 @@ services:
       - key: TRUST_PROXY_HOPS
         value: "1"
       - key: FIREBASE_PROJECT_ID
-        sync: false
+        value: tamayaapp
       - key: DATABASE_URL
         sync: false
       - key: QR_SIGNING_SECRET
         generateValue: true
-      - key: PUBLIC_BASE_URL
-        sync: false
-      - key: CORS_ORIGINS
-        sync: false
       - key: GOOGLE_APPLICATION_CREDENTIALS
         value: /etc/secrets/firebase-admin.json
 # Verify Render uses exactly one trusted reverse-proxy hop before enabling TRUST_PROXY_HOPS=1.
 # Add firebase-admin.json using Render Secret Files; do not add it to GitHub.
-# Render plan/fees are chosen by the account owner. This file creates no contract itself.
+# PUBLIC_BASE_URL uses Render's built-in RENDER_EXTERNAL_URL by default.
+# Add CORS_ORIGINS only when hosting a browser app; native iPhone requests do not need it.
+# Free is for initial validation; the owner chooses any paid plan separately.
+# This file creates no service or contract itself.

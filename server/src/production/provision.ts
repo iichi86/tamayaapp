@@ -2,12 +2,13 @@ import { randomBytes } from 'node:crypto';
 import { open, unlink } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { Pool, type PoolClient } from 'pg';
-import { loadProductionEnvironment, productionConfig } from './config.js';
+import { databaseSetupConfig, loadProductionEnvironment, ProductionConfigurationError } from './config.js';
+import { resolveDatabasePasswordPlaceholder } from './passwordPrompt.js';
 
 /** One-time, owner-run provisioning. Never expose this as an HTTP endpoint. */
 async function main(): Promise<void> {
   loadProductionEnvironment();
-  const config = productionConfig({ ...process.env, DATABASE_URL: process.env.DATABASE_MIGRATION_URL ?? process.env.DATABASE_URL });
+  const config = databaseSetupConfig(await resolveDatabasePasswordPlaceholder());
   const role = 'tamaya_runtime';
   const filePath = resolve('.env.runtime.generated');
   const file = await open(filePath, 'wx', 0o600);
@@ -42,4 +43,4 @@ async function main(): Promise<void> {
     if (!succeeded) await unlink(filePath).catch(() => undefined);
   }
 }
-main().catch(() => { console.error('DB実行用設定を生成できませんでした。既存ファイルを上書きしません。接続設定・権限を確認してください。'); process.exitCode = 1; });
+main().catch((error: unknown) => { console.error(error instanceof ProductionConfigurationError ? error.message : 'DB実行用設定を生成できませんでした。既存ファイルを上書きしません。接続設定・権限を確認してください。'); process.exitCode = 1; });
