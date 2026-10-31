@@ -345,6 +345,16 @@ npm ci --offline --no-audit --no-fund
 
 `npm ci --offline`は保存済みのキャッシュから導入します。足りないものがあれば`ENOTCACHED`などで止まるため、その表示で次に必要なファイルを確認します。キャッシュが見つかっただけで、全パッケージが揃っているとは判断しません。失敗した状態でExpoの起動へ進みません。
 
+今回の所有者の結果は、605件中603件が保存済み、1件を再利用でき、残り1件が`@firebase/firestore@4.17.2`でした。この版はロックファイルにある公式URLから約11 MBのアーカイブを取得し、ローカルファイルとしてキャッシュへ登録できます。次を1行ずつ実行します。取得中にエラーで終了した場合は次へ進みません。
+
+```bat
+curl.exe --fail --location --retry 3 --retry-all-errors --continue-at - --progress-bar --output ".npm-cache\firestore-4.17.2.tgz" "https://registry.npmjs.org/@firebase/firestore/-/firestore-4.17.2.tgz"
+npm cache add ".npm-cache\firestore-4.17.2.tgz" --offline
+npm ci --offline --no-audit --no-fund
+```
+
+同じファイルの取得をやり直す場合、curlは保存途中の位置からの再開を試みます。配布元が範囲取得へ対応することを確認しています。`npm cache add`はローカルのアーカイブを登録し、この操作で依存のインストールやライフサイクルスクリプトの実行は行いません。続く`npm ci`はロックファイルのintegrityと照合します。通信方式を変えてこの1件を補う手順で、アプリの依存バージョンや保存先の構成は変更しません。
+
 インストール成功時の「added … packages」はnpmが自動表示する文章です。手入力するコマンドではありません。`npm error`で停止した場合は、Expoの起動へ進まず、その停止原因を確認します。
 
 ### 開発担当向け：実サービスに接続せず連携を確認する場合
