@@ -1,7 +1,8 @@
 import { Pool } from 'pg';
-import { databaseSetupConfig, loadProductionEnvironment, ProductionConfigurationError } from './config.js';
+import { databaseSetupConfig, loadProductionEnvironment } from './config.js';
 import { PostgresDatabase } from './database.js';
 import { resolveDatabasePasswordPlaceholder } from './passwordPrompt.js';
+import { formatDatabaseSetupError } from './setupErrors.js';
 
 async function main() {
   loadProductionEnvironment();
@@ -10,4 +11,4 @@ async function main() {
   try { await db.migrate(); console.log('PostgreSQLの会員サービス用テーブルを準備しました。'); }
   finally { await db.close(); }
 }
-main().catch((error: unknown) => { console.error(error instanceof ProductionConfigurationError ? error.message : 'DBの準備を完了できませんでした。接続先・管理者権限を確認してください。'); process.exitCode = 1; });
+main().catch((error: unknown) => { console.error(formatDatabaseSetupError(error)); process.exitCode = 1; });
