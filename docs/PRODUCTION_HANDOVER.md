@@ -167,6 +167,20 @@ notepad .env.runtime.generated
 
 古い版の「DB実行用設定を生成できませんでした」という表示だけでは原因を判定できません。担当が案内する修正版の`src/production/setupErrors.ts`と`src/production/provision.ts`だけを現在の`server`フォルダーへ取得すれば、同じPC内の設定を使って再実行できます。依存ライブラリの変更はありません。更新のダウンロードに失敗した場合は、その時点で止めて表示を伝えます。
 
+2026年10月31日、所有者のWindows PCで`DB_TLS_CERTIFICATE`と表示されることを確認しました。これはTLS証明書の検証に失敗したことを示し、入力したDBパスワードの正誤はまだ判断できません。Supabaseの公式[管理画面の設定](https://github.com/supabase/supabase/blob/master/apps/studio/hooks/custom-content/custom-content.json)と[SSL画面の実装](https://github.com/supabase/supabase/blob/master/apps/studio/components/interfaces/Settings/Database/SSLConfiguration.tsx)で、本番用CAの取得先を確認しました。同じ`server`フォルダーのコマンド画面で、次を1行ずつ実行します。
+
+```bat
+curl.exe -fLsS "https://supabase-downloads.s3-ap-southeast-1.amazonaws.com/prod/ssl/prod-ca-2021.crt" -o "supabase-ca.crt"
+set "DATABASE_CA_PATH=supabase-ca.crt"
+npm run db:provision
+```
+
+最初のダウンロードで`curl:`から始まるエラーが出た場合は、次のコマンドへ進みません。ブラウザーから取得する場合は、[対象プロジェクトのDatabase Settings](https://supabase.com/dashboard/project/ohpbgirqcfxinhntmavk/database/settings)の`SSL configuration`にある`Download certificate`を使います。証明書を取得しただけでは適用されず、アプリ側の`DATABASE_CA_PATH`設定が必要です。
+
+この`set`は現在のコマンド画面だけに有効です。接続成功後は、PC内の`server/.env.production`の`DATABASE_CA_PATH=`を`DATABASE_CA_PATH=supabase-ca.crt`へ変更して保存します。公開先でも証明書ファイルをサーバー側へ配置し、その実際のパスを`DATABASE_CA_PATH`に設定します。証明書は公開情報で、Firebase Adminの秘密鍵とは異なります。TLSの接続先名と証明書の検証は有効のままです。
+
+クラウド作業環境ではCA配布先への取得が403となり、証明書本体の内容・有効期間・所有者環境での接続成功はまだ確認できていません。公式URLの出典確認と、実接続の成功は区別します。
+
 専用ユーザーの作成はDBトランザクション内で行います。接続・権限エラーなどで確定前に失敗した場合はロールバックし、今回作成した途中ファイルのみを除去します。接続設定は書き込み・同期・ファイルを閉じる処理を終えてからDBを確定します。確定要求の応答が失われた場合は、作成されたかもしれない専用ユーザーの接続情報を失わないよう、生成ファイルを残します。
 
 ## 4．管理サーバーを公開先へ置く
