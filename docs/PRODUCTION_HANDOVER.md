@@ -263,6 +263,19 @@ Windowsでは`--pick-credentials`でファイル選択画面を開き、以前Re
 
 Dockerの実行用イメージでは開発用の`tsx`を含めないため、同じ処理はコンパイル済みの`node dist/server/src/production/owner.js --uid "本人のUID" --credentials "管理用JSONのパス"`で実行します。Renderの無料プランのShellを前提にせず、今回の初回設定は所有者のPCから行えます。
 
+### PCからDBへの通信が完了しない場合
+
+今回の所有者の実行では、Windowsのファイル選択が使え、管理用JSONとFirebaseの対象ユーザーの照合後にDBパスワードの入力まで進みました。その後`DB_NETWORK_FAILED`で止まっています。これは権限付与が完了したかどうかを確定する表示ではありません。
+
+CLIはDBパスワードの入力前に、対象ユーザーが正しいFirebaseプロジェクトに存在し、メール確認済みで停止されていないことを確認します。この確認ができている場合は、プロジェクト所有者がログインした[Supabase SQL Editor](https://supabase.com/dashboard/project/ohpbgirqcfxinhntmavk/sql)から設定できます。PCからのPostgreSQL直接接続を使わず、ブラウザーの管理画面から実行する方法です。
+
+1. SQL Editorで新しいクエリを作ります。
+2. [初回オーナー設定SQL](../server/supabase/bootstrap_owner.sql)の2か所の`__OWNER_FIREBASE_UID__`を、確認済みの本人UIDへ置き換えます。開発担当が具体的なSQLを作る場合も、個別UIDを公開リポジトリーへ保存しません。
+3. SQL Editorへ全文を貼り付けて`Run`を押します。このSQLをWindowsの黒いコマンド画面へ貼りません。
+4. 最後の結果が`role=owner`、`active=true`になったら、アプリで「設定」→「最新の情報に更新」を押し、再び設定から「店舗スタッフの画面へ」を開きます。
+
+このSQLは店舗ID・Firebaseプロジェクト・有効な会員登録・退会処理がないことを照合し、同じロック順で対象の権限を設定します。変更時だけ監査記録を残すため、以前のCLIが実際には完了していた場合も再実行できます。RLSや公開権限、店舗情報、スタンプ・クーポンは変更しません。`OWNER_ACTIVE_MEMBER_REQUIRED`なら、先にアプリのニックネームと同意を含む会員登録を完了します。Firebaseの有効状態の確認を省略するための手順ではありません。
+
 ## 6．アプリを本番接続先へ向ける
 
 Expo側に設定するのは、管理サーバーのURL、店舗ID、Firebase Webアプリの公開設定です。`EXPO_PUBLIC_…`という名前の設定はアプリへ埋め込まれるため、誰でも取得し得るものとして扱います。
