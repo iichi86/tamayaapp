@@ -1,10 +1,10 @@
 # 本番接続版の引継ぎと、利用者に必要な最小限の作業
 
-更新日：2026年10月30日（日本時間）。Windowsを使う方を想定しています。
+更新日：2026年10月31日（日本時間）。Windowsを使う方を想定しています。
 
 この文書は、端末内だけのデモを確認した後、Firebaseでログインし、管理サーバーを通じてSupabaseの共有データベースを使う構成へ進むための案内です。正式な条件は[運用ルール](OPERATING_RULES.md)にまとめています。
 
-**ソースの実装・ローカル検証と、実際の外部サービスへの配置は別です。** Firebaseの`tamayaapp`プロジェクトとWebアプリは作成され、所有者から受け取った4項目の公開設定をアプリの設定例へ反映しました。Firebase Adminの秘密鍵JSONは所有者のPCへ保存済みです。Supabaseでは所有者が10テーブルを作成し、全テーブルのRLSが有効と確認しました。接続先の公開情報も受領しています。管理APIへの秘密設定の登録、専用DBユーザーの作成、実Firebaseのログイン、共有DBへの実接続、インターネット上での稼働、今回の本番接続版のiPhone実機確認は完了していません。TestFlightへの送信やApp Store公開も行っていません。完了した検証と未検証の範囲は[検証結果](VALIDATION.md)を確認してください。
+**ソースの実装・ローカル検証と、実際の外部サービスへの配置は別です。** Firebaseの`tamayaapp`プロジェクトとWebアプリは作成され、所有者から受け取った4項目の公開設定をアプリの設定例へ反映しました。Firebase Adminの秘密鍵JSONは所有者のPCへ保存済みです。Supabaseでは所有者が10テーブルを作成し、全テーブルのRLSが有効と確認しました。2026年10月31日、所有者のWindows PCで公式CAの設定後、専用DBユーザーを作成できたとの報告を受けました。管理APIへの秘密設定の登録、実Firebaseのログイン、専用DBユーザーを使った管理APIの起動、インターネット上での稼働、今回の本番接続版のiPhone実機確認は完了していません。TestFlightへの送信やApp Store公開も行っていません。完了した検証と未検証の範囲は[検証結果](VALIDATION.md)を確認してください。
 
 ## 何をどこへ保存するか
 
@@ -199,6 +199,26 @@ npm run db:provision
 
 サーバーが使う主な設定は次のとおりです。最終的な記入例はサーバー側の設定例とREADMEを参照してください。
 
+### 今回のWindows PCからRenderへ登録する
+
+2026年10月31日、所有者から新規Web Service画面の`Advanced`内に`Secret Files`が表示されているとの回答を受けました。対象は`iichi86/tamayaapp`、Languageは`Docker`、Branchは`main`、Root Directoryは空欄、Dockerfile Pathは`server/Dockerfile`、Docker build contextはリポジトリーのルート、初期確認用Computeは`$0/month`です。無料であることを画面の金額表示でも確認します。
+
+設定値の手入力を減らすため、最新版の`server/src/production/prepareRender.ts`を用意しました。現在の`server`フォルダーで次を実行します。古いZIPの場合は、このファイル1つだけを担当から案内された公式リポジトリーのURLから取得できます。
+
+```bat
+npx --no-install tsx src/production/prepareRender.ts
+```
+
+この処理は、実行専用DBの生成ファイルと、今回保存した`supabase-ca.crt`を読み取って確認します。管理者のDB接続情報や未設定の値、期限外・不正なCAは受け付けません。QR署名用の秘密値をランダムに生成し、必要な9項目をローカルの`.env.render.generated`へ保存します。ファイルの中身は画面に表示せず、外部通信もしません。元のDB設定・CA・既存のRender設定ファイルは上書きしません。
+
+1. Renderの作成画面で`Environment Variables`の`Add from .env`を開きます。ファイルを選ぶ画面なら、現在の`server/.env.render.generated`を選びます。テキストを貼る画面なら、PCで`notepad .env.render.generated`を実行し、中身全体をRenderの入力欄にだけコピーします。取り込みの確定ボタンを押して、9項目が追加されたことを確認します。入力済みの画面や値をチャットへ送る必要はありません。
+2. `Advanced`内の`Secret Files`で、名前を`supabase-ca.crt`として、PCの`server/supabase-ca.crt`の中身を登録します。ファイルを選ぶ形式の場合も、同じCAファイルを選びます。
+3. 同じ場所に、名前を`firebase-admin.json`として、以前Firebaseからダウンロードした管理用JSONを登録します。ファイル選択形式なら元のJSONを選び、内容入力形式ならメモ帳から全文をその入力欄だけへコピーします。保存名の欄は`firebase-admin.json`にそろえます。内容をチャットやGitHubへ貼りません。
+4. 2つのファイル名、Dockerの設定、無料プラン、必要であれば`/health`のヘルスチェックを確認してから、`Deploy web service`で初回起動します。新規サービスの作成は本番店舗への一般公開やApp Storeへの申請とは別です。
+5. 起動後に表示される公開URLの末尾へ`/health`を付けて開きます。失敗した場合は、秘密値を含まない状態表示と診断コードを確認します。起動成功だけでFirebaseの実ログイン、スタッフ権限、スタンプ・特典の運用確認まで済んだとは扱いません。
+
+生成される`DATABASE_URL`には、今回の専用ログインだけを使います。`GOOGLE_APPLICATION_CREDENTIALS`は`/etc/secrets/firebase-admin.json`、`DATABASE_CA_PATH`は`/etc/secrets/supabase-ca.crt`です。`PUBLIC_BASE_URL`はRenderが提供する`RENDER_EXTERNAL_URL`から取得するため、作成前にURLを推測して入力しません。初期確認用のネイティブiPhone接続に`CORS_ORIGINS`の設定は不要です。
+
 | 設定 | 用途 |
 | --- | --- |
 | `APP_ENV=production` | 本番として起動 |
@@ -206,6 +226,7 @@ npm run db:provision
 | `DATABASE_URL` | Supabase PostgreSQLの秘密の接続文字列 |
 | `FIREBASE_PROJECT_ID` | 本人確認に使うプロジェクトID |
 | 管理用Firebase認証の設定 | サーバーのみに置くサービスアカウント／実行環境の認証 |
+| `DATABASE_CA_PATH` | サーバーに配置したSupabase公式CAのパス。今回のRenderでは`/etc/secrets/supabase-ca.crt` |
 | `QR_SIGNING_SECRET` | QRに署名する32文字以上の十分にランダムな秘密値 |
 | `PUBLIC_BASE_URL` | 独自ドメイン等の場合のHTTPSオリジン。Renderでは未設定なら`RENDER_EXTERNAL_URL`を使用 |
 | `CORS_ORIGINS` | 許可するブラウザー公開先。複数の場合はカンマ区切り |

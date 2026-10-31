@@ -27,8 +27,11 @@ services:
         generateValue: true
       - key: GOOGLE_APPLICATION_CREDENTIALS
         value: /etc/secrets/firebase-admin.json
+      - key: DATABASE_CA_PATH
+        value: /etc/secrets/supabase-ca.crt
 # Verify Render uses exactly one trusted reverse-proxy hop before enabling TRUST_PROXY_HOPS=1.
-# Add firebase-admin.json using Render Secret Files; do not add it to GitHub.
+# Add firebase-admin.json and the official supabase-ca.crt using Render Secret Files.
+# Keep the Firebase private key out of GitHub.
 # PUBLIC_BASE_URL uses Render's built-in RENDER_EXTERNAL_URL by default.
 # Add CORS_ORIGINS only when hosting a browser app; native iPhone requests do not need it.
 # Free is for initial validation; the owner chooses any paid plan separately.
