@@ -4,7 +4,7 @@
 
 この文書は、端末内だけのデモを確認した後、Firebaseでログインし、管理サーバーを通じてSupabaseの共有データベースを使う構成へ進むための案内です。正式な条件は[運用ルール](OPERATING_RULES.md)にまとめています。
 
-**ソースの実装・ローカル検証と、実際の外部サービスへの配置は別です。** Firebaseの`tamayaapp`プロジェクトとWebアプリは作成され、所有者から受け取った4項目の公開設定をアプリの設定例へ反映しました。Firebase Adminの秘密鍵JSONは所有者のPCへ保存済みです。Supabaseでは所有者が10テーブルを作成し、全テーブルのRLSが有効と確認しました。2026年10月31日、所有者のWindows PCで公式CAの設定後、専用DBユーザーを作成できたとの報告を受けました。管理APIへの秘密設定の登録、実Firebaseのログイン、専用DBユーザーを使った管理APIの起動、インターネット上での稼働、今回の本番接続版のiPhone実機確認は完了していません。TestFlightへの送信やApp Store公開も行っていません。完了した検証と未検証の範囲は[検証結果](VALIDATION.md)を確認してください。
+**ソースの実装・ローカル検証と、実際の外部サービスへの配置は別です。** Firebaseの`tamayaapp`プロジェクトとWebアプリは作成され、公開設定4項目をアプリの設定例へ反映しました。Firebase Adminの秘密鍵JSONは所有者のPCへ保存されています。Supabaseでは所有者が10テーブルを作成し、全テーブルのRLSが有効と確認しました。2026年10月31日、所有者のWindows PCで公式CAの設定後、専用DBユーザーの作成が完了しました。続けてRenderの公開URL`https://tamayaapp.onrender.com`が提示され、所有者のChromeで`/health`が`status=ok`、`authMode=firebase`と表示されました。サーバー起動とDBの店舗情報取得の確認です。こちらの作業環境からRenderへの通信は制限され、直接の確認はできていません。実Firebaseの会員登録・ログイン、初回オーナー登録、業務操作、本番接続版のiPhone実機確認はこの後です。TestFlight送信やApp Store公開も行っていません。完了した検証と未検証の範囲は[検証結果](VALIDATION.md)を確認してください。
 
 ## 何をどこへ保存するか
 
@@ -185,7 +185,7 @@ npm run db:provision
 
 ## 4．管理サーバーを公開先へ置く
 
-公開先はRenderで準備します。ソースにはDockerとデプロイ用設定を用意し、Node.js APIをHTTPSで動かす構成を使います。初期検証用の設定はFreeです。実店舗運用前に休止・起動時間・常時稼働の条件を確認し、必要な有料契約は所有者が別途選びます。実アカウントへの配置は、まだ行っていません。
+公開先はRenderです。ソースにはDockerとデプロイ用設定を用意し、Node.js APIをHTTPSで動かす構成を使います。初期検証用の設定はFreeです。2026年10月31日、所有者の操作で公開URLが作成され、`/health`の成功報告を受けました。実店舗運用前に休止・起動時間・常時稼働の条件を確認し、必要な有料契約は所有者が別途選びます。
 
 1. サーバー公開先の自分のアカウントへログインします。
 2. GitHubの`iichi86/tamayaapp`を参照できるよう、必要なリポジトリだけの連携を許可します。
@@ -249,10 +249,15 @@ npx --no-install tsx src/production/prepareRender.ts
 サーバー管理者がPCのソースから初回設定を行うコマンドは、`server`を現在地にして次のとおりです。引用符の中を、確認した本人のUIDに置き換えます。
 
 ```bat
-npm run owner:production -- --uid "ここを本人のUIDに置き換える"
+set "DATABASE_CA_PATH=supabase-ca.crt"
+npm run owner:production -- --uid "ここを本人のUIDに置き換える" --credentials "管理用JSONの実際のパス"
 ```
 
-これは旧デモ・SQLite用の`npm run owner`とは別のコマンドです。Firebaseのメール未確認・停止アカウントでは初回オーナーに設定できません。Dockerの実行用イメージでは、開発用の`tsx`を含めないため、同じ処理はコンパイル済みの`node dist/server/src/production/owner.js --uid "本人のUID"`で実行します。
+これは旧デモ・SQLite用の`npm run owner`とは別のコマンドです。2026年10月31日の修正版は、初期準備用`DATABASE_MIGRATION_URL`を使い、DBパスワードを非表示入力します。PCの`server/.env.production`にある管理用接続先をそのまま使え、HTTPの公開URLやQR秘密値は不要です。`--credentials`には、そのPCに保存したFirebase管理用JSONのファイルパスを指定します。エクスプローラーでJSONを右クリックし「パスのコピー」を使えば、内容を共有せずに指定できます。`GOOGLE_APPLICATION_CREDENTIALS`に正しいローカルパスを設定済みなら、この引数は省略できます。古いZIPの場合は`src/production/owner.ts`だけを担当が案内する修正版へ更新してください。
+
+管理用JSONのプロジェクト、Firebaseの対象ユーザー、既存DBの店舗のプロジェクトが一致し、本人のメール確認が済み、停止されていないことを確認してから権限を設定します。共有DBの店舗情報や公開URLをPC内の設定で上書きしません。UIDや管理用JSONの中身をログへ出さず、エラーは`OWNER_…`または既存の`DB_…`コードで確認できます。
+
+Dockerの実行用イメージでは開発用の`tsx`を含めないため、同じ処理はコンパイル済みの`node dist/server/src/production/owner.js --uid "本人のUID" --credentials "管理用JSONのパス"`で実行します。Renderの無料プランのShellを前提にせず、今回の初回設定は所有者のPCから行えます。
 
 ## 6．アプリを本番接続先へ向ける
 
@@ -278,6 +283,8 @@ notepad .env
 | `EXPO_PUBLIC_FIREBASE_PROJECT_ID` | 同じWebアプリの`projectId`。管理サーバーと一致させる |
 | `EXPO_PUBLIC_FIREBASE_APP_ID` | 同じWebアプリの`appId` |
 
+今回の公開URLは`https://tamayaapp.onrender.com`です。最新版の`.env.example`へ反映しています。すでにPCへ展開した版は古い設定例のままなので、アプリ直下の`.env`にある行を`EXPO_PUBLIC_API_URL=https://tamayaapp.onrender.com`へ変更します。現在地が`…\server>`なら`cd ..`でアプリ直下へ移動できます。この展開先でアプリ側の依存をまだ導入していない場合は、上記の`npm ci`を実行します。サーバー側で済ませた`npm ci`とはインストール先が異なります。
+
 保存したらメモ帳を閉じ、黒い画面で次を実行します。
 
 ```bat
@@ -286,7 +293,18 @@ npm start -- --go --clear
 
 起動後のQRをiPhoneの標準カメラで読み取り、Expo Goで開きます。黒い画面は開いたままにしてください。起動用QRの詳しい場所と操作は[iPhone手順](IPHONE.md)を参照してください。今回追加したFirebase JavaScript SDKはExpo Goで使う構成で、React Native Firebaseのネイティブライブラリを追加する手順ではありません。Expo GoとプロジェクトのSDKが一致することは、その時点の端末表示でも確認します。
 
-PCブラウザーで開く場合は、起動中の黒い画面で`w`を押します。アプリを停止する場合はCtrl＋Cです。
+PCブラウザーで画面を開く操作は、起動中の黒い画面で`w`です。ただし実Render APIへブラウザーから接続するには、そのブラウザーの接続元をサーバーの`CORS_ORIGINS`へ登録する必要があります。今回のネイティブiPhone用設定ではブラウザーのAPI通信を許可していないため、まずiPhoneのExpo Goで確認します。アプリを停止する場合はCtrl＋Cです。
+
+### 初回の本人登録とログイン確認
+
+1. iPhoneで「ホーム」の`会員登録・ログイン`、または下部の`会員証`を開きます。
+2. `はじめての方：会員登録`を押し、自分で受信できるメールと12文字以上のパスワードを入力します。規約・プライバシーの同意を確認して`確認メールを送って登録する`を押します。
+3. 受信した確認メールのリンクを開き、Expo Goへ戻って`メール確認後、会員登録へ進む`を押します。メール未着時は`確認メールを再送する`があります。
+4. 20文字以内のニックネームを入力し、表示内容と同意を確認して`会員登録して会員証を表示`を押します。通常の本人登録は0スタンプで開始します。
+5. 右上の`設定`を開き、`ログインID（スタッフ権限の登録用）`を確認します。これが初回オーナー設定コマンドのUIDです。パスワードやDB接続情報とは異なります。
+6. オーナー設定後は`設定`から`最新の情報に更新`を押し、もう一度設定を開いて`店舗スタッフの画面へ`を確認します。
+
+これらは実Firebaseの登録・確認メール・管理APIの本人登録を検証する操作です。`/health`の成功だけで、ここまで成功したとは扱いません。
 
 署名済みの配布アプリを作る前に、`EXPO_IOS_BUNDLE_IDENTIFIER`へ所有者が使える一意のIDを設定します。`RELEASE_BUSINESS_APPROVED`は公開文書・正式特典・運用の内容を確認した後にだけ承認済みへ変更します。設定の不足確認は次のコマンドです。
 
