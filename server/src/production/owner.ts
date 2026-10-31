@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { resolve, win32 } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { Pool } from 'pg';
 import { getAuth } from 'firebase-admin/auth';
@@ -17,6 +18,8 @@ const messages = {
   OWNER_CREDENTIALS_REQUIRED: 'PCに保存したFirebase管理用JSONの場所を--credentialsまたはGOOGLE_APPLICATION_CREDENTIALSで指定してください。内容を共有する必要はありません。',
   OWNER_CREDENTIALS_INVALID: 'Firebase管理用JSONを読み取れないか、形式が正しくありません。PCに保存した管理用ファイルの場所を確認してください。',
   OWNER_CREDENTIALS_PROJECT: 'Firebase管理用JSONのプロジェクトとFIREBASE_PROJECT_IDが一致しません。正しい店舗のプロジェクトを確認してください。',
+  OWNER_FILE_SELECTION_CANCELLED: '管理用JSONが選択されなかったため、権限を変更せずに終了しました。準備できたら同じコマンドを実行してください。',
+  OWNER_FILE_PICKER_UNAVAILABLE: 'Windowsのファイル選択画面を開けませんでした。--credentialsで管理用JSONのパスを指定する方法を使ってください。',
   OWNER_ACCOUNT_NOT_FOUND: '指定されたUIDのFirebaseアカウントが見つかりません。本人のアカウントのUIDを確認してください。',
   OWNER_AUTH_FAILED: 'Firebaseのアカウントを確認できませんでした。管理用JSON、Firebaseの設定、PCの接続を確認してください。',
   OWNER_ACCOUNT_NOT_VERIFIED: 'このアカウントはメール確認が完了していません。確認メールのリンクを開いてから再実行してください。',
@@ -39,6 +42,49 @@ export interface OwnerSetupOptions {
   credentialsPath?: string;
   env?: NodeJS.ProcessEnv;
   readPassword?: () => Promise<string>;
+}
+
+/** Desktop-only convenience. The selected path stays in this local process. */
+export function pickOwnerCredentialsFile(options: { platform?: NodeJS.Platform; select?: () => string } = {}): string {
+  if ((options.platform ?? process.platform) !== 'win32') throw new OwnerSetupError('OWNER_FILE_PICKER_UNAVAILABLE');
+  let selected: string;
+  try {
+    selected = options.select ? options.select() : execFileSync('powershell.exe', ['-NoProfile', '-STA', '-Command', [
+      '[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)',
+      'Add-Type -AssemblyName System.Windows.Forms',
+      '$dialog = New-Object System.Windows.Forms.OpenFileDialog',
+      "$dialog.Title = 'Firebase管理用JSONを選んでください'",
+      "$dialog.Filter = 'Firebase管理用JSON (*.json)|*.json'",
+      '$dialog.CheckFileExists = $true',
+      '$dialog.Multiselect = $false',
+      "$dialog.InitialDirectory = [System.IO.Path]::Combine([Environment]::GetFolderPath('UserProfile'), 'Downloads')",
+      'try { if ($dialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) { [Console]::WriteLine($dialog.FileName) } else { exit 3 } } finally { $dialog.Dispose() }',
+    ].join('; ')], { encoding: 'utf8', windowsHide: true, maxBuffer: 65536 });
+  } catch (error) {
+    throw new OwnerSetupError((error as { status?: number })?.status === 3 ? 'OWNER_FILE_SELECTION_CANCELLED' : 'OWNER_FILE_PICKER_UNAVAILABLE');
+  }
+  selected = selected.trim();
+  if (!selected) throw new OwnerSetupError('OWNER_FILE_SELECTION_CANCELLED');
+  if (!win32.isAbsolute(selected) || !/\.json$/i.test(selected) || /[\x00-\x1f\x7f]/.test(selected)) throw new OwnerSetupError('OWNER_CREDENTIALS_INVALID');
+  return selected;
+}
+
+export function parseOwnerArguments(args: string[]): { uid: string; credentialsPath?: string; pickCredentials: boolean } {
+  let uid: string | undefined;
+  let credentialsPath: string | undefined;
+  let pickCredentials = false;
+  for (let index = 0; index < args.length; index++) {
+    const flag = args[index];
+    if (flag === '--pick-credentials' && !pickCredentials) { pickCredentials = true; continue; }
+    const value = args[++index];
+    if (!value || value.startsWith('--')) throw new OwnerSetupError('OWNER_UID_REQUIRED');
+    if (flag === '--uid' && uid === undefined) uid = value;
+    else if (flag === '--credentials' && credentialsPath === undefined) credentialsPath = value;
+    else throw new OwnerSetupError('OWNER_UID_REQUIRED');
+  }
+  if (!uid) throw new OwnerSetupError('OWNER_UID_REQUIRED');
+  if (pickCredentials && credentialsPath) throw new OwnerSetupError('OWNER_CREDENTIALS_INVALID');
+  return { uid, credentialsPath, pickCredentials };
 }
 
 /** Trusted local setup only. Never expose this operation through an HTTP route. */
@@ -110,17 +156,9 @@ export async function bootstrapProductionOwner(options: OwnerSetupOptions): Prom
 
 async function main(): Promise<void> {
   loadProductionEnvironment();
-  const args = process.argv.slice(2);
-  let uid: string | undefined;
-  let credentialsPath: string | undefined;
-  for (let index = 0; index < args.length; index += 2) {
-    const value = args[index + 1];
-    if (!value || value.startsWith('--')) throw new OwnerSetupError('OWNER_UID_REQUIRED');
-    if (args[index] === '--uid' && uid === undefined) uid = value;
-    else if (args[index] === '--credentials' && credentialsPath === undefined) credentialsPath = value;
-    else throw new OwnerSetupError('OWNER_UID_REQUIRED');
-  }
-  await bootstrapProductionOwner({ uid: uid ?? '', credentialsPath });
+  const { uid, credentialsPath, pickCredentials } = parseOwnerArguments(process.argv.slice(2));
+  if (pickCredentials) console.log('Windowsのファイル選択画面で、Firebase管理用JSONを選んでください。');
+  await bootstrapProductionOwner({ uid, credentialsPath: pickCredentials ? pickOwnerCredentialsFile() : credentialsPath });
   console.log('オーナー権限を設定しました。アプリで再読み込みすると店舗管理が利用できます。');
 }
 

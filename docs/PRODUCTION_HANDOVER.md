@@ -250,10 +250,14 @@ npx --no-install tsx src/production/prepareRender.ts
 
 ```bat
 set "DATABASE_CA_PATH=supabase-ca.crt"
-npm run owner:production -- --uid "ここを本人のUIDに置き換える" --credentials "管理用JSONの実際のパス"
+npm run owner:production -- --uid "ここを本人のUIDに置き換える" --pick-credentials
 ```
 
-これは旧デモ・SQLite用の`npm run owner`とは別のコマンドです。2026年10月31日の修正版は、初期準備用`DATABASE_MIGRATION_URL`を使い、DBパスワードを非表示入力します。PCの`server/.env.production`にある管理用接続先をそのまま使え、HTTPの公開URLやQR秘密値は不要です。`--credentials`には、そのPCに保存したFirebase管理用JSONのファイルパスを指定します。エクスプローラーでJSONを右クリックし「パスのコピー」を使えば、内容を共有せずに指定できます。`GOOGLE_APPLICATION_CREDENTIALS`に正しいローカルパスを設定済みなら、この引数は省略できます。古いZIPの場合は`src/production/owner.ts`だけを担当が案内する修正版へ更新してください。
+これは旧デモ・SQLite用の`npm run owner`とは別のコマンドです。2026年10月31日の修正版は、初期準備用`DATABASE_MIGRATION_URL`を使い、DBパスワードを非表示入力します。PCの`server/.env.production`にある管理用接続先をそのまま使え、HTTPの公開URLやQR秘密値は不要です。古いZIPの場合は`src/production/owner.ts`だけを担当が案内する修正版へ更新してください。
+
+Windowsでは`--pick-credentials`でファイル選択画面を開き、以前Renderへ登録したFirebase管理用JSONを選べます。Windows標準のPowerShellとファイル選択機能を使い、JSONの中身をチャットへ送らずに指定できます。キャンセル時は権限を変更せず終了し、日本語や空白を含む保存先も扱います。アプリ起動用のExpoの画面を開いたまま、別のコマンド画面を`server`フォルダーで開いて実行します。
+
+ファイル選択画面を使わない場合は、`--pick-credentials`の代わりに`--credentials "管理用JSONの実際のパス"`を指定できます。`GOOGLE_APPLICATION_CREDENTIALS`に正しいローカルパスを設定済みなら、どちらの引数も省略できます。ファイル選択画面はWindows専用です。
 
 管理用JSONのプロジェクト、Firebaseの対象ユーザー、既存DBの店舗のプロジェクトが一致し、本人のメール確認が済み、停止されていないことを確認してから権限を設定します。共有DBの店舗情報や公開URLをPC内の設定で上書きしません。UIDや管理用JSONの中身をログへ出さず、エラーは`OWNER_…`または既存の`DB_…`コードで確認できます。
 
