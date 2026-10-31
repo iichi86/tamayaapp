@@ -310,7 +310,7 @@ function Main({ api, auth }: { api: ProductionApi; auth: AuthPort }) {
       {store.address ? <><Text style={styles.label}>住所</Text><Text selectable style={styles.body}>{store.address}</Text><Button label="地図で住所を開く" variant="secondary" onPress={() => { void openLink(`https://maps.apple.com/?q=${encodeURIComponent(`${store.name} ${store.address}`)}`); }} /></> : <Muted>住所は確認後に掲載します。</Muted>}
       {store.phone ? <><Text style={styles.label}>店舗の電話番号</Text><Text selectable style={styles.body}>{store.phone}</Text><Button label="店舗に電話する" variant="secondary" onPress={() => { if (store.phone) void openLink(`tel:${store.phone.replace(/[^+\d]/g, '')}`); }} /></> : <Muted>店舗の電話番号は確認後に掲載します。</Muted>}
       {store.hours && <><Text style={styles.label}>営業時間</Text><Text style={styles.body}>{store.hours}</Text></>}
-    </Card><Card><Heading>玉屋のお菓子</Heading>{store.products.map((product) => <View key={product.id} style={s.listItem}><Text style={styles.body}>{product.name}</Text></View>)}</Card>
+    </Card>
       <Notices notices={notices} /><RuleNote store={store} /><Card><Heading>アプリについて</Heading>
         <Muted>会員サービス運営者：{store.operator.name}</Muted><Muted>会員サービスのお問い合わせ：{store.operator.phone}</Muted>
         <Button label="お問い合わせ・機種変更のご案内" variant="secondary" onPress={() => setLegal('support')} />

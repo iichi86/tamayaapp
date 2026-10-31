@@ -301,7 +301,32 @@ test('small screens and larger browser text retain four customer routes and usab
         }
       }
     }
-    await customer.page.getByRole('tab', { name: 'お店', exact: true }).click(); await capture(customer.page, 'shop-small');
+    await customer.page.getByRole('tab', { name: 'お店', exact: true }).click();
+    await expect(customer.page.getByText('東京都中野区本町4-30-14', { exact: true })).toBeVisible();
+    await expect(customer.page.getByText('03-3381-7012', { exact: true })).toBeVisible();
+    await expect(customer.page.getByText('10:00〜19:00（基本定休日：月曜日）', { exact: true })).toBeVisible();
+    await expect(customer.page.getByRole('button', { name: '店舗に電話する', exact: true })).toBeVisible();
+    await expect(customer.page.getByText('会員サービスのお問い合わせ：080-4909-7012', { exact: true })).toBeVisible();
+    await expect(customer.page.getByRole('heading', { name: '玉屋のお菓子', exact: true })).toHaveCount(0);
+    for (const name of ['どら焼き', '鍋横最中', '長者もち', 'お赤飯']) {
+      await expect(customer.page.getByText(name, { exact: true })).toHaveCount(0);
+    }
+    // Exercise the actual map button without navigating to an external service.
+    await customer.page.evaluate(() => {
+      const state = window as unknown as { storeOriginalOpen: typeof window.open; storeOpenedUrl?: string };
+      state.storeOriginalOpen = window.open;
+      window.open = ((url) => { state.storeOpenedUrl = String(url); return null; }) as typeof window.open;
+    });
+    try {
+      await customer.page.getByRole('button', { name: '地図で住所を開く', exact: true }).click();
+      const value = await customer.page.evaluate(() => (window as unknown as { storeOpenedUrl?: string }).storeOpenedUrl);
+      const map = new URL(value!);
+      expect(map.origin).toBe('https://maps.apple.com');
+      expect(map.searchParams.get('q')).toBe('むさしの玉屋 東京都中野区本町4-30-14');
+    } finally {
+      await customer.page.evaluate(() => { window.open = (window as unknown as { storeOriginalOpen: typeof window.open }).storeOriginalOpen; });
+    }
+    await capture(customer.page, 'shop-small');
   } finally { await customer.context.close(); }
 });
 

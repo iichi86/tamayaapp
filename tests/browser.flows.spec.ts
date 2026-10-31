@@ -294,6 +294,30 @@ test('customer and staff controls fit each viewport with 48px touch targets and 
   await showSample(page);
   for (const tab of ['ホーム', '会員証', '特典', 'お店']) {
     await page.getByRole('tab', { name: tab, exact: true }).click();
+    if (tab === 'お店') {
+      await expect(page.getByText('東京都中野区本町4-30-14', { exact: true })).toBeVisible();
+      await expect(page.getByText('03-3381-7012', { exact: true })).toBeVisible();
+      await expect(page.getByText('10:00〜19:00（基本定休日：月曜日）', { exact: true })).toBeVisible();
+      await expect(page.getByRole('button', { name: '電話をかける', exact: true })).toBeVisible();
+      await expect(page.getByText('玉屋のお菓子', { exact: true })).toHaveCount(0);
+      for (const name of ['どら焼き', '鍋横最中', '長者もち', 'お赤飯']) {
+        await expect(page.getByText(name, { exact: true })).toHaveCount(0);
+      }
+      await page.evaluate(() => {
+        const state = window as unknown as { storeOriginalOpen: typeof window.open; storeOpenedUrl?: string };
+        state.storeOriginalOpen = window.open;
+        window.open = ((url) => { state.storeOpenedUrl = String(url); return null; }) as typeof window.open;
+      });
+      try {
+        await page.getByRole('button', { name: '地図で見る　↗', exact: true }).click();
+        const value = await page.evaluate(() => (window as unknown as { storeOpenedUrl?: string }).storeOpenedUrl);
+        const map = new URL(value!);
+        expect(map.origin).toBe('https://www.google.com');
+        expect(map.searchParams.get('query')).toBe('東京都中野区本町4-30-14');
+      } finally {
+        await page.evaluate(() => { window.open = (window as unknown as { storeOriginalOpen: typeof window.open }).storeOriginalOpen; });
+      }
+    }
     await expectLayout(page);
     if (tab === 'ホーム') await expectHomeActionAboveNavigation(page);
     await enlargeText(page);

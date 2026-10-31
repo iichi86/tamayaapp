@@ -238,18 +238,6 @@ export function CustomerScreens({ tab, data, onTab, onRegister }: Props) {
         {tab === 'お店' && (
           <>
             <View style={cs.storeIntro}><Text style={styles.eyebrow}>お店のご案内</Text><Text accessibilityRole="header" style={[cs.shopName, { marginTop: 8 }]}>{shop.name}</Text><Muted>{shop.area}</Muted><View style={cs.storeAccent} /></View>
-            <SectionHeader title="玉屋のお菓子" caption="おなじみの、四つの名前" />
-            <View style={cs.productGrid}>
-              {shop.products.map((product, index) => (
-                <View key={product.id} style={[cs.product, { width: wide ? '23.5%' : '47.8%' }]}>
-                  <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={[cs.productArt, index === 1 && { backgroundColor: '#EEEBE1' }, index === 2 && { backgroundColor: '#EDF1E8' }, index === 3 && { backgroundColor: '#F1E8E5' }]}><Text accessible={false} allowFontScaling={false} style={[cs.productSymbol, index === 3 && { color: '#9A6559' }]}>{product.motif}</Text><View style={cs.productArtLine} /></View>
-                  <Text style={cs.productName}>{product.name}</Text>
-                  {product.description && <Muted>{product.description}</Muted>}
-                  {product.price !== null && <Text style={styles.label}>{yen(product.price)}円</Text>}
-                </View>
-              ))}
-            </View>
-            <Muted style={{ fontSize: 11, textAlign: 'right' }}>商品は文字と図形によるイメージです。</Muted>
             <Card>
               <Heading style={{ fontSize: 21 }}>店舗情報</Heading>
               <InfoRow label="エリア" value={shop.area} />
@@ -257,7 +245,6 @@ export function CustomerScreens({ tab, data, onTab, onRegister }: Props) {
               <InfoRow label="営業時間" value={shop.hours ?? '店舗情報を確認中です'} />
               <InfoRow label="電話番号" value={shop.phone ?? '店舗情報を確認中です'} />
               {(shop.address || shop.phone) && <View style={styles.row}>{shop.address && <Button label="地図で見る　↗" variant="secondary" onPress={() => { void Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shop.address!)}`); }} />}{shop.phone && <Button label="電話をかける" variant="secondary" onPress={() => { void Linking.openURL(`tel:${shop.phone}`); }} />}</View>}
-              <Muted style={{ fontSize: 11 }}>商品の取り扱い・価格、店舗情報は試作版では未掲載です。</Muted>
             </Card>
             <SectionHeader title="お知らせ" caption="玉屋からのご案内" />
             <Card style={{ gap: 0 }}>
@@ -366,12 +353,6 @@ const cs = StyleSheet.create({
   couponList: { flexDirection: 'row', flexWrap: 'wrap', gap: 18, justifyContent: 'space-between' },
   storeIntro: { paddingVertical: 8, gap: 10 },
   storeAccent: { width: 44, height: 3, backgroundColor: theme.gold, marginTop: 9 },
-  productGrid: { flexDirection: 'row', gap: 12, flexWrap: 'wrap', justifyContent: 'space-between' },
-  product: { gap: 13, marginBottom: 8 },
-  productArt: { aspectRatio: 1.02, backgroundColor: '#EEE8D8', borderRadius: 20, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-  productSymbol: { fontSize: 91, color: '#A58E62', fontWeight: '300', lineHeight: 112 },
-  productArtLine: { width: '66%', height: 1, backgroundColor: '#B8AB8C', position: 'absolute', bottom: 26, opacity: 0.5 },
-  productName: { color: theme.ink, fontSize: 19, lineHeight: 30, letterSpacing: 1.2, fontWeight: '600' },
   infoRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-start', gap: 12 },
   infoLabel: { width: 85, fontSize: 15, lineHeight: 25, color: theme.muted },
   infoValue: { flex: 1, minWidth: 130, fontSize: 16, lineHeight: 27, color: theme.ink },
