@@ -8,7 +8,7 @@
 
 PC のブラウザーでデモが開けたところから、iPhone で開く手順です。**起動用 QR コードは、PC の黒い画面に `npm run start:demo -- --go --clear` を入力すると表示されます。**
 
-この版は **Expo SDK 57** です。2026 年 10 月 25 日、利用者の iPhone に「Expo Go は SDK 57 用、プロジェクトは SDK 54」と表示されたため、PC 側のプロジェクトを更新しました。古い SDK 54 版のファイルが PC に残っている場合は、先にプロジェクトの更新が必要です。更新後の `package.json` と `package-lock.json` をそろえてから `npm ci` を実行してください。すでに SDK 57 版の部品をインストール済みなら、毎回 `npm ci` を実行する必要はありません。iPhone の Expo Go の削除や端末の初期化は不要です。
+現在のソースは **Expo SDK 58** に合わせています。2026年11月1日、2台目のiPhoneで「Expo GoはSDK 58用、プロジェクトはSDK 57」と表示されました。以前はSDK 54から57へ更新していますが、今回の不一致にはSDK 58への更新が必要です。古いSDK 57版のPCフォルダーは、同じ更新版の `package.json` と `package-lock.json` をそろえてから部品を入れ直します。すでにSDK 58版を導入済みなら、毎回 `npm ci` を実行する必要はありません。
 
 ### PC と iPhone を同じネットワークにつなぐ
 
@@ -31,45 +31,19 @@ cd /d "%USERPROFILE%\Downloads\tamayaapp-main\tamayaapp-main"
 
 保存先を変えた場合は、`package.json` と `README.md` が入っているフォルダーの場所に読み替えてください。すでにそのフォルダーで黒い画面を開いている場合、移動し直す必要はありません。
 
-### PC：旧SDK 54版を更新する（今回の不一致エラーが出た場合）
+### PC：SDKの不一致を解消する
 
-PC と iPhone の Expo アカウントへのログインまで済んでいて、iPhone に「installed version は SDK 57、project は SDK 54」と表示された方向けの手順です。**同じアプリのフォルダーで、依存部品の設定ファイルを 2 つ更新します。ZIP 全体をダウンロード・展開し直す必要はありません。**
+「installed version」はiPhone側のExpo Go、「project」はPC側のアプリです。今回の「installed versionは58、projectは57」は、PCのアプリをSDK 58へ更新する必要がある表示です。Wi-Fiのつなぎ直しやQRの読み取り直しだけでは解消しません。
 
-上の手順で古いサーバーを `Ctrl + C` で止め、黒い画面をアプリのフォルダーへ移動してから始めてください。以下は検証済みの SDK 57 版のファイルを指定しています。**各コード枠の 1 行だけをコピーして黒い画面に貼り付け、Enter を押します。ひとつの処理が終わってから、次へ進みます。**
+本番接続版は[SDK更新手順](PRODUCTION_HANDOVER.md#expo-goとアプリのsdkをそろえる)に沿って、PCの2つの依存設定ファイルを更新します。このページの旧デモも同じ依存設定を使います。部品の導入後、旧デモを見る場合だけ次を実行します。
 
-1. 最初の設定ファイルを取得します。
+```bat
+npm run start:demo -- --go --clear
+```
 
-   ```bat
-   curl.exe -fL "https://raw.githubusercontent.com/iichi86/tamayaapp/430973b293e2166c14c20f9b2dd7c83d14463113/package.json" -o package.json
-   ```
+本番接続版の確認を続ける場合は、引継ぎ手順の `npm start -- --go --clear` を使います。新しく表示されたPCのQRを読み取ってください。
 
-   転送が終わり、`C:\Users\...>` の入力行に戻るまで待ちます。`curl: (...)` というエラーが出たら、次へ進まず、その画面のスクリーンショットを共有してください。
-
-2. もうひとつの設定ファイルを取得します。
-
-   ```bat
-   curl.exe -fL "https://raw.githubusercontent.com/iichi86/tamayaapp/430973b293e2166c14c20f9b2dd7c83d14463113/package-lock.json" -o package-lock.json
-   ```
-
-   こちらも転送が終わるまで待ちます。エラーが出たら次へ進みません。2 つのファイルを両方更新してから、部品をインストールします。
-
-3. SDK 57 に対応する部品をインストールします。
-
-   ```bat
-   npm ci
-   ```
-
-   数分かかる場合があります。途中で別の命令を入力せず、`C:\Users\...>` の入力行に戻るまで待ちます。`npm error` が出た場合は、次へ進まず画面を共有してください。`npm warn` は警告です。最終的にエラーがなく入力行に戻ったら次へ進みます。
-
-4. 更新したアプリを起動します。
-
-   ```bat
-   npm run start:demo -- --go --clear
-   ```
-
-   `Use port 8082 instead? (Y/n)` と聞かれたら、半角の `y` を入力して Enter を押します。**この起動で新しく表示された QR コード**を、iPhone の標準「カメラ」で読み取ります。古いサーバーの QR コードや Expo Go の古い履歴ではなく、新しい QR を使ってください。
-
-この更新が終われば、毎回ファイルの取得や `npm ci` を繰り返す必要はありません。すでに PC と iPhone でログイン済みなら、次のログイン・インストールの項目もやり直さず、「iPhone：標準カメラで PC の QR コードを読む」へ進みます。まだログインしていない場合は、手順 4 の起動前に、次の 2 項目で PC と iPhone のログインを済ませてください。
+使うiPhoneが2台なら、**両方のExpo GoをSDK 58対応版にそろえます。** App StoreでExpo Goを開き、「アップデート」があれば実行します。Expo Goの削除やスマホの初期化は不要です。PCのSDK更新で、Firebaseの会員、スタンプ、スタッフ権限を作り直す必要もありません。
 
 ### PC：無料の Expo アカウントでログインする
 
@@ -89,7 +63,7 @@ PC と iPhone の Expo アカウントへのログインまで済んでいて、
 1. iPhone の App Store で **Expo Go** を検索してインストールします。
 2. Expo Go を開き、右上のアカウントアイコン（人のマーク）を押します。「Sign in」または「Log in」を押し、**PC と同じ Expo アカウント**でログインします。
 
-このプロジェクトは SDK 57 を使い、最低 iOS バージョンは 16.4 です。Expo Go 自体のインストール条件は、iPhone の App Store 表示も確認してください。このデモでは有料の Apple Developer Program 登録は不要です。
+このプロジェクトはSDK 58を使います。Expo Goが対応するiOSの条件は、使用するiPhoneのApp Store表示で確認してください。このデモでは有料の Apple Developer Program 登録は不要です。
 
 ### PC：黒い画面に起動用 QR コードを表示する
 
@@ -124,11 +98,11 @@ PC のブラウザーと iPhone では、デモの保存データが別です。
 
 - QR コードが見つからない場合：Expo のサーバーが動いている黒い画面で、日本語入力をオフにし、半角英数の `c` を 1 回押して表示し直します。コマンドの入力行に戻っている場合は、先に `npm run start:demo -- --go --clear` を実行します。
 - 黒い画面にエラーが出る、または表示し直しても QR コードが出ない場合：起動コマンドを実行した後の、**PC の黒い画面のスクリーンショット**を共有してください。表示内容から次の操作を確認できます。
-- `Project is incompatible with this version of Expo Go` が出る場合：画面の SDK の数字を確認します。「installed version」は iPhone 側、「project」は PC のプロジェクト側です。「installed version は 57、project は 54」なら、古い SDK 54 版のサーバーにつながっています。PC 側のプロジェクトを更新し、古いサーバーを `Ctrl + C` で止めてから起動し直し、新しく表示された QR を読み取ってください。
+- `Project is incompatible with this version of Expo Go` が出る場合：画面の SDK の数字を確認します。「installed version」は iPhone 側、「project」は PC のプロジェクト側です。「installed versionは58、projectは57」なら、PC側のSDK 57版が起動しています。[SDK更新手順](PRODUCTION_HANDOVER.md#expo-goとアプリのsdkをそろえる)に沿ってPCを更新し、古いサーバーを `Ctrl + C` で止めてから起動し直し、新しく表示されたQRを読み取ってください。
 - Expo アカウントのエラーが出る場合：PC の `npx expo whoami` と、iPhone の Expo Go のアカウントを確認し、同じものにそろえます。ログイン後は iPhone の「Try Again」で再試行します。
 - 読み込みが進まない場合：PC と iPhone が同じルーターにつながっているか、iPhone の Expo Go にローカルネットワーク接続を許可したかを確認します。公共 Wi-Fi では、端末間の通信が禁止されている場合があります。
 
-SDK の対応については [Expo の公式説明](https://docs.expo.dev/troubleshooting/expo-go-version-mismatch/)、アカウントについては [公式の同一アカウント要件](https://docs.expo.dev/troubleshooting/expo-go-sign-in-required/)を参照してください。更新日：2026 年 10 月 25 日。以前の SDK 54 対応という案内は今回の端末に合わなかったため、実際のエラー画面で示された SDK 57 に合わせました。**この更新だけで iPhone 実機での動作確認が済んだことにはなりません。** 以下の記録欄とチェック欄へ、実際に試してから記入してください。
+SDK の対応については [Expo の公式説明](https://docs.expo.dev/troubleshooting/expo-go-version-mismatch/)、アカウントについては [公式の同一アカウント要件](https://docs.expo.dev/troubleshooting/expo-go-sign-in-required/)を参照してください。更新日：2026年11月1日。以前のSDK 54から57への更新後、今回の端末画面で新たに示されたSDK 58へ合わせる手順に更新しています。**この更新だけで iPhone 実機での動作確認が済んだことにはなりません。** 以下の記録欄とチェック欄へ、実際に試してから記入してください。
 
 ## 記録欄
 
@@ -136,7 +110,7 @@ SDK の対応については [Expo の公式説明](https://docs.expo.dev/troubl
 | --- | --- |
 | 確認日・時刻（日本時間） | 未確認 |
 | iPhone 機種 / iOS バージョン | 未確認 |
-| Expo Go バージョン / SDK | 利用者のエラー画面では SDK 57 用 / プロジェクトは 57（起動は未確認） |
+| Expo Go バージョン / SDK | 11月1日の2台目のエラー画面はSDK 58用／PCは57。更新後の起動は未確認 |
 | 画面サイズ・文字サイズ | 未確認 |
 | PC の OS / Node.js バージョン | 未確認 |
 | 確認者 / 気付いた点 | 未確認 |
