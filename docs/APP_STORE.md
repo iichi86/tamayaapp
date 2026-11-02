@@ -185,6 +185,30 @@ npx eas-cli@25.3.0 project:info
 
 `.env` はGitHubへ公開しません。EASクラウドビルドではPCの `.env` に依存せず、Expoの対象プロジェクト → Environment variables → production環境へ、`.env.example` の公開接続設定、`EXPO_IOS_BUNDLE_IDENTIFIER`、`EAS_PROJECT_ID`、確認済みのリリース用フラグを登録します。DBパスワードやFirebase管理秘密鍵は登録しません。
 
+### 作成済みのEASへ公開接続設定を登録する
+
+2026年11月2日、所有者のWindows画面で`@oneight/tamaya-members-demo`の作成・連携と、`project:info`の成功を確認しました。実際のUUIDは`b84c88d0-b923-4a2a-b144-9fe5f0528f8d`です。リポジトリーの`app.json`と設定例もこの値へそろえています。
+
+現在のアプリ直下の黒い画面で、公開接続設定だけをまとめたファイルを取得します。
+
+```bat
+curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/b8264bdd6b6ebc09e34947431ba7e942da035e33/deployment/eas-production.env" -o .env.eas.production
+```
+
+取得できたら、EASのproduction環境へ登録します。
+
+```bat
+npx eas-cli@25.3.0 env:push production --path .env.eas.production
+```
+
+登録結果を確認します。
+
+```bat
+npx eas-cli@25.3.0 env:list production
+```
+
+ファイルはFirebaseの公開設定、APIのURL、店舗ID、EASのUUID、運用確認待ちのフラグの9項目です。`EXPO_PUBLIC_*`はPublic、それ以外はSensitiveとして登録され、一部の値は一覧で伏せられます。通常の`.env`全体をアップロードする操作ではありません。ファイルにない変数は削除しません。未確定のBundle IDは空値として登録せず、正式な値を決めてから追加します。`RELEASE_BUSINESS_APPROVED`は`0`のままで、文書・運用の確認を終えてから別途設定します。上書き確認やアカウント共通変数との競合が出た場合は、その内容を確認してから続けます。
+
 ## 8．公開用ビルドの設定を確認する
 
 アプリのフォルダーの`eas.json`を確認します。このリポジトリには、次の公開用設定を用意しています。
