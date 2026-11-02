@@ -157,13 +157,31 @@ Gitでソースを管理している場合は、この2行は不要です。通�
 
 ### Expo上のプロジェクトを作る
 
+2026年11月2日、所有者のWindows画面でEAS CLIへのログイン成功と、利用できるアカウントに対するOwner権限を確認しました。今回の作成先はログイン中の`oneight`を指定します。
+
+Windowsの古いZIPを使っている場合は、先に開発担当が案内する修正版の`app.config.ts`へ更新します。修正版は、EASが保存した`app.json`のProject ID・所有者を読み直し、`.env`の公開設定も読み込みます。EASから渡された環境変数は優先して保持します。
+
+今回の更新コマンドは、アプリ直下の黒い画面で次の1行です。取得がエラーになったら次へ進まず、その表示を確認します。
+
 ```bat
-npx eas-cli@25.3.0 init
+curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/4cc580522562fc73ad4113dae062d8a570aa28a6/app.config.ts" -o app.config.ts
 ```
 
-プロジェクトを新規作成する確認が出たら、自分のExpoアカウント配下であることとアプリ名を確認し、作成を選びます。候補を選ぶ画面なら矢印キーで選んでEnter、`(Y/n)`の形式なら`y`を入力してEnterを押します。
+前のZIP用の2つの`set`を同じ画面で実行してから、次を実行します。
 
-このプロジェクトは動的設定 `app.config.ts` を使います。自動編集できないと表示されたら、Expoで実際に作成されたプロジェクトのUUIDを確認し、PCの直下 `.env` に `EAS_PROJECT_ID=実際のUUID` を追加します。EASのproduction環境にも同じ値を登録します。**適当なIDは作らないでください。** `npx eas-cli@25.3.0 project:info` で紐付けを確認します。
+```bat
+npx eas-cli@25.3.0 init --account oneight
+```
+
+`@oneight/tamaya-members-demo`を新規作成する確認、または同じ名前の既存プロジェクトへ連携する確認が出た場合は、内容を確認して進めます。`(Y/n)`の形式なら`y`を入力してEnterを押します。`--force`で既存の連携を上書きする手順にはしていません。
+
+修正版の動的設定は、EASが`app.json`へ保存するProject IDと所有者を取り込みます。完了したら、次でプロジェクト名と実際のUUIDを確認します。
+
+```bat
+npx eas-cli@25.3.0 project:info
+```
+
+自動保存でエラーが出た場合は、新しいプロジェクトを何度も作成せず、その画面から連携結果を確認します。作成済みのIDが必要な場合は、`node -p "require('./app.json').expo.extra?.eas?.projectId"`でローカルに保存された値を確認できます。確認できた実UUIDをPCの`.env`の`EAS_PROJECT_ID`とEASのproduction環境へそろえます。**適当なIDは作らないでください。**
 
 `.env` はGitHubへ公開しません。EASクラウドビルドではPCの `.env` に依存せず、Expoの対象プロジェクト → Environment variables → production環境へ、`.env.example` の公開接続設定、`EXPO_IOS_BUNDLE_IDENTIFIER`、`EAS_PROJECT_ID`、確認済みのリリース用フラグを登録します。DBパスワードやFirebase管理秘密鍵は登録しません。
 
