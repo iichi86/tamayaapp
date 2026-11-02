@@ -10,7 +10,7 @@ RUN --mount=type=secret,id=build_ca \
 COPY shared /app/shared
 COPY server/tsconfig.json ./
 COPY server/src ./src
-RUN npm run build && npm prune --omit=dev --no-audit --no-fund
+RUN npm run build && npm prune --omit=dev --omit=optional --no-audit --no-fund
 
 FROM node:24-bookworm-slim AS runtime
 ENV NODE_ENV=production APP_ENV=production HOST=0.0.0.0 PORT=3001

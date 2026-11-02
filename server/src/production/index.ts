@@ -25,17 +25,32 @@ async function main(): Promise<void> {
       authMode: config.authMode, logger: true, trustProxyHops: config.trustProxyHops,
     });
     let processing = false;
-    const runDeletions = async () => {
+    let nextRetentionRun = 0;
+    const runMaintenance = async () => {
       if (processing) return;
       processing = true;
       try {
-        const result = await processDeletionJobs(db, verifier, config.projectId);
-        if (result.failed) app!.log.warn({ event: 'account_deletion_retry', count: result.failed }, '未完了の退会処理を次回再試行します。');
-      } catch { app!.log.warn({ event: 'account_deletion_worker_failed' }, '退会処理の再試行を次回実行します。'); }
+        try {
+          const result = await processDeletionJobs(db, verifier, config.projectId);
+          if (result.failed) app!.log.warn({ event: 'account_deletion_retry', count: result.failed }, '未完了の退会処理を次回再試行します。');
+        } catch { app!.log.warn({ event: 'account_deletion_worker_failed' }, '退会処理の再試行を次回実行します。'); }
+        if (Date.now() >= nextRetentionRun) {
+          nextRetentionRun = Date.now() + 60 * 60_000;
+          try {
+            const counts = await db.purgeDetachedRecords(store.id, config.projectId);
+            if (Object.values(counts).some((count) => count > 0)) {
+              app!.log.info({ event: 'detached_records_purged', counts }, '90日を経過した退会後の記録を削除しました。');
+            }
+          } catch {
+            nextRetentionRun = Date.now() + 5 * 60_000;
+            app!.log.warn({ event: 'detached_record_retention_failed' }, '退会後の記録の定期削除を次回再試行します。');
+          }
+        }
+      }
       finally { processing = false; }
     };
-    await runDeletions();
-    worker = setInterval(() => { void runDeletions(); }, 30_000);
+    await runMaintenance();
+    worker = setInterval(() => { void runMaintenance(); }, 30_000);
     worker.unref();
     const address = await app.listen({ host: config.host, port: config.port });
     console.log(`玉屋 会員サービスAPI: ${address}`);

@@ -1,9 +1,11 @@
 import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
 const require = createRequire(import.meta.url);
+const serverRoot = fileURLToPath(new URL('../server/', import.meta.url));
 const name = `tamaya-db-check-${process.pid}`;
-const child = (cmd, args, env = process.env, inherited = false) => new Promise((resolve, reject) => {
-  const proc = spawn(cmd, args, { stdio: inherited ? 'inherit' : ['ignore', 'pipe', 'pipe'], env, windowsHide: true });
+const child = (cmd, args, env = process.env, inherited = false, cwd = undefined) => new Promise((resolve, reject) => {
+  const proc = spawn(cmd, args, { cwd, stdio: inherited ? 'inherit' : ['ignore', 'pipe', 'pipe'], env, windowsHide: true });
   let output = ''; proc.stdout?.on('data', (data) => { output += data; });
   proc.once('error', reject); proc.once('exit', (code) => code === 0 ? resolve(output.trim()) : reject(new Error(`検証コマンドが終了しました（${code}）。Dockerと依存ライブラリを確認してください。`)));
 });
@@ -18,8 +20,8 @@ try {
     try { await child('docker', ['exec', name, 'pg_isready', '-U', 'tamaya_check']); break; }
     catch { if (i === 99) throw new Error('検証用DBを準備できませんでした。'); await new Promise((resolve) => setTimeout(resolve, 200)); }
   }
-  await child(process.execPath, [require.resolve('../server/node_modules/vitest/vitest.mjs'), 'run', '--root', 'server'], {
+  await child(process.execPath, [require.resolve('../server/node_modules/vitest/vitest.mjs'), 'run'], {
     ...process.env, TEST_DATABASE_URL: `postgres://tamaya_check:local-validation-only@127.0.0.1:${port}/tamaya_check`,
-  }, true);
+  }, true, serverRoot);
 } catch (error) { console.error(error.message); process.exitCode = 1; }
 finally { if (started) await child('docker', ['stop', '--time', '3', name]).catch(() => undefined); }

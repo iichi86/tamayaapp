@@ -458,6 +458,55 @@ export class PostgresDatabase implements ProductionDatabasePort {
     return pending.rowCount ? 'pending' : 'completed';
   }
 
+  /** Trusted maintenance only: expire records already detached by completed withdrawal. */
+  async purgeDetachedRecords(storeId: string, projectId: string): Promise<{
+    stampEvents: number; coupons: number; auditRecords: number; deletionJobs: number;
+  }> {
+    return this.tx(async (client) => {
+      const store = await this.store(client, storeId, 'share');
+      if (!projectId || store.firebase_project_id !== projectId) {
+        throw failure('PROJECT_MISMATCH', 409, '店舗と認証プロジェクトが一致しません。');
+      }
+      const cutoff = new Date((await this.now(client)).getTime() - 90 * 86400_000);
+      // Each table is bounded independently. Locked rows are retried by a later run.
+      const stampEvents = await client.query(`
+        WITH expired AS (
+          SELECT id FROM tamaya.stamp_events
+          WHERE store_id=$1 AND member_id IS NULL AND created_at<=$2
+          ORDER BY created_at,id LIMIT 1000 FOR UPDATE SKIP LOCKED
+        ) DELETE FROM tamaya.stamp_events target USING expired WHERE target.id=expired.id`, [storeId, cutoff]);
+      const coupons = await client.query(`
+        WITH expired AS (
+          SELECT id FROM tamaya.coupons
+          WHERE store_id=$1 AND member_id IS NULL AND issued_at<=$2
+          ORDER BY issued_at,id LIMIT 1000 FOR UPDATE SKIP LOCKED
+        ) DELETE FROM tamaya.coupons target USING expired WHERE target.id=expired.id`, [storeId, cutoff]);
+      const auditRecords = await client.query(`
+        WITH expired AS (
+          SELECT id FROM tamaya.audit_log
+          WHERE store_id=$1 AND member_id IS NULL AND created_at<=$2
+            AND (actor_uid='deleted' OR target_id='deleted')
+            -- A custom Firebase UID can literally be "deleted". Preserve ambiguous
+            -- records while such a member/staff identity still exists in this store.
+            AND NOT EXISTS (SELECT 1 FROM tamaya.members WHERE store_id=$1 AND uid='deleted')
+            AND NOT EXISTS (SELECT 1 FROM tamaya.staff WHERE store_id=$1 AND uid='deleted')
+          ORDER BY created_at,id LIMIT 1000 FOR UPDATE SKIP LOCKED
+        ) DELETE FROM tamaya.audit_log target USING expired WHERE target.id=expired.id`, [storeId, cutoff]);
+      // Withdrawal spans all stores in a Firebase project, so completed jobs are
+      // project-wide. Pending jobs and jobs without a known completion date stay.
+      const deletionJobs = await client.query(`
+        WITH expired AS (
+          SELECT id FROM tamaya.deletion_jobs
+          WHERE firebase_project_id=$1 AND state='completed' AND uid IS NULL AND completed_at<=$2
+          ORDER BY completed_at,id LIMIT 1000 FOR UPDATE SKIP LOCKED
+        ) DELETE FROM tamaya.deletion_jobs target USING expired WHERE target.id=expired.id`, [projectId, cutoff]);
+      return {
+        stampEvents: stampEvents.rowCount ?? 0, coupons: coupons.rowCount ?? 0,
+        auditRecords: auditRecords.rowCount ?? 0, deletionJobs: deletionJobs.rowCount ?? 0,
+      };
+    });
+  }
+
   async completeDeletion(jobId: string): Promise<void> {
     await this.tx(async (client) => {
       const found = (await client.query<{ id: string; uid: string | null; firebase_project_id: string; state: string }>('SELECT * FROM tamaya.deletion_jobs WHERE id=$1', [jobId])).rows[0];
@@ -466,7 +515,8 @@ export class PostgresDatabase implements ProductionDatabasePort {
       const job = (await client.query<{ id: string; uid: string | null; firebase_project_id: string; state: string }>('SELECT * FROM tamaya.deletion_jobs WHERE id=$1 FOR UPDATE', [jobId])).rows[0];
       if (!job || job.state === 'completed' || !job.uid) return;
       const members = (await client.query<{ id: string }>('SELECT id FROM tamaya.members WHERE store_id=ANY($1) AND uid=$2 FOR UPDATE', [stores, job.uid])).rows.map((row) => row.id);
-      // Remove cached JSON snapshots and identity references, retain only anonymous operation counts.
+      // Remove cached identity snapshots and references. Detached event records
+      // remain until the trusted 90-day maintenance process expires them.
       await client.query('DELETE FROM tamaya.idempotency WHERE store_id=ANY($1) AND (actor_uid=$2 OR member_id=ANY($3::uuid[]) OR response->>\'uid\'=$2)', [stores, job.uid, members]);
       await client.query('UPDATE tamaya.audit_log SET target_id=\'deleted\' WHERE store_id=ANY($1) AND (member_id=ANY($2::uuid[]) OR target_id=$3)', [stores, members, job.uid]);
       await client.query('UPDATE tamaya.audit_log SET actor_uid=\'deleted\' WHERE store_id=ANY($1) AND actor_uid=$2', [stores, job.uid]);

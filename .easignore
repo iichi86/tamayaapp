@@ -1,0 +1,45 @@
+# EAS uses this file instead of .gitignore. Keep local data and credentials out.
+node_modules/
+.expo/
+dist/
+dist-ios/
+.npm-cache/
+.expo-home/
+.expo-user/
+test-results/
+playwright-report/
+playwright-report-production/
+*.log
+.env*
+local-data/
+.firebase/
+**/*service-account*.json
+**/firebase-admin*.json
+**/*firebase-adminsdk*.json
+**/credentials.json
+**/*.p8
+**/*.p12
+**/*.mobileprovision
+**/*.key
+**/*.pem
+**/*.dump
+**/*.backup
+**/*.sql
+**/*.bak
+**/*.sqlite*
+
+# A native build needs the published store rules for its pre-install check.
+# The management API, database files and administration tools run elsewhere.
+/server/*
+!/server/config
+/server/config/*
+!/server/config/tamaya.json
+/tools/
+/docs/
+/tests/
+/deployment/
+/scripts/*
+!/scripts/release-check.mjs
+/playwright.config.ts
+/production.playwright.config.ts
+/vitest.config.mts
