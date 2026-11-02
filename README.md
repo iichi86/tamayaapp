@@ -6,6 +6,8 @@ React Native・Expo SDK 58・TypeScriptのiPhone向け会員アプリです。�
 
 公開用の規約・データの取り扱いは、回答済みの保管方針を反映した[公開文書の確認案](docs/LEGAL_REVIEW.md)に整理しています。アプリへ適用する前の案です。
 
+Apple Developer Programの確認待ちの間は、[準備済みの資料と先に進める作業](docs/WAITING_FOR_APPLE.md)を参照してください。App Store掲載文案、バックアップ・復元、90日削除、ビルド用ファイルの整理を準備しています。
+
 ## 現在の状態
 
 - 本番用のホーム・会員証・特典・お店は管理APIの情報を表示します。会員データはサーバーに保存します。
