@@ -15,6 +15,13 @@
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "appName": "むさしの玉屋",
+        "language": "ja",
+        "sku": "tamaya-members-ios",
+        "bundleIdentifier": "jp.oneeight.tamaya.members"
+      }
+    }
   }
 }
