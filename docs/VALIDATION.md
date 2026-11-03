@@ -1,5 +1,9 @@
 # 現在の検証結果（本番接続版）
 
+2026年11月4日追記（EASへのBundle ID反映と公開文書の最終案）：所有者のWindows画面で、`@oneight/tamaya-members-demo`への変数作成成功と、`env:list production`に`EXPO_IOS_BUNDLE_IDENTIFIER=jp.oneeight.tamaya.members`が表示されたことを確認しました。全10項目のうち、表示された8項目は用意した公開設定と一致しています。`EAS_PROJECT_ID`と`RELEASE_BUSINESS_APPROVED`の2項目はSensitiveとして伏せられており、実際の値をこの画面から再確認したとは扱いません。こちらがEASへログインして登録・照会した結果ではありません。所有者のPCの`.env`の内容と最終的なExpo設定は、この画面だけでは独立して確認していません。
+
+[公開文書の最終確認案](PUBLIC_DOCUMENTS_REVIEW.md)を用意し、利用規約・プライバシー・サポートの3本文をローカルの公開ページへ渡して200応答を確認しました。担当者向けメモが本文へ混入しないことと、実際の店舗設定がdraftのままであることも照合しました。DB・外部サービスへの変更や追加のテストスイート実行はありません。既存会員の同意記録は保持する案とし、正式版への同意を取得済みとは扱いません。所有者から掲載名「むさしの玉屋」と店舗の正式ロゴを使う希望を受領し、ロゴ画像の受領・差し替えは次の作業です。署名付きビルド・App Store Connectのアプリ作成・TestFlight送信は未実施です。
+
 2026年11月3日追記（Appleの管理画面とBundle ID登録）：所有者のiPhoneで「登録保留中」に代わりチームと`Account Holder`が表示され、その後PCのIdentifiers一覧へアクセスできた画面を確認しました。続いて一覧に`Tamaya Members`／`jp.oneeight.tamaya.members`が登録された画面を受領しました。こちらがAppleのAPIへ接続した確認ではありません。個人の氏名・メールアドレス・チームIDは公開資料へ転記していません。
 
 登録値を`app.json`、`.env.example`、EAS登録用の公開設定ファイルへ反映し、開発環境のローカル設定も同じ値へ更新しました。既存のExpo設定テスト3件と、実際のproductionプロファイルでBundle ID・既存EASプロジェクトIDが一致する読込み確認が成功しました。配布前チェックはBundle IDの2項目を解消し、運営者確認と規約・プライバシー方針のdraft状態の2項目を引き続き検出します。承認フラグは`0`のままです。所有者のWindowsとEAS productionへの反映は、用意した手順による次の作業です。証明書の作成・署名付きビルド・App Store Connectのアプリ登録・TestFlight送信は未実施です。
