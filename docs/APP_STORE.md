@@ -156,30 +156,30 @@ AppleやExpoの画面は更新されます。ここに書いた日本語・英�
 cd /d "%USERPROFILE%\Downloads\tamaya-server-setup\tamayaapp-main"
 ```
 
-GitHubの最新版から、ビルドに使う6ファイルを既存の保存先へ更新します。
+今回検証したコミットから、ビルドに使う6ファイルを既存の保存先へ更新します。取得元を固定して、同じ版の文面・ロゴ・ビルド設定をそろえます。
 
 ```bat
-curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/main/app.json" -o app.json
+curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/69d52e93543f7d4946b3ddd15de8d8a1b34827f0/app.json" -o app.json
 ```
 
 ```bat
-curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/main/app.config.ts" -o app.config.ts
+curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/69d52e93543f7d4946b3ddd15de8d8a1b34827f0/app.config.ts" -o app.config.ts
 ```
 
 ```bat
-curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/main/.easignore" -o .easignore
+curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/69d52e93543f7d4946b3ddd15de8d8a1b34827f0/.easignore" -o .easignore
 ```
 
 ```bat
-curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/main/eas.json" -o eas.json
+curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/69d52e93543f7d4946b3ddd15de8d8a1b34827f0/eas.json" -o eas.json
 ```
 
 ```bat
-curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/main/server/config/tamaya.json" -o "server\config\tamaya.json"
+curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/69d52e93543f7d4946b3ddd15de8d8a1b34827f0/server/config/tamaya.json" -o "server\config\tamaya.json"
 ```
 
 ```bat
-curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/main/assets/app-icon.png" -o "assets\app-icon.png"
+curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/69d52e93543f7d4946b3ddd15de8d8a1b34827f0/assets/app-icon.png" -o "assets\app-icon.png"
 ```
 
 既存の`.env`を開きます。
