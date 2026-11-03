@@ -6,7 +6,7 @@
 
 2026年11月4日更新：Apple側の`Tamaya Members`／`jp.oneeight.tamaya.members`の登録に加え、所有者の画面でEASのproduction環境への同じBundle IDの追加成功と、10項目の一覧を確認しました。表示された8項目の値は公開接続設定と一致し、`EAS_PROJECT_ID`・`RELEASE_BUSINESS_APPROVED`の2項目はSensitiveで伏せられているため実値を再確認したとは扱いません。PCの`.env`保存結果とExpoの最終設定は未確認で、次のビルド準備時に照合します。これらは所有者の画面による確認で、開発側が外部アカウントへ接続して照会した結果ではありません。証明書・署名付きビルド・App Store Connectのアプリ作成・TestFlight送信は未実施です。
 
-次は[公開文書の最終確認案](PUBLIC_DOCUMENTS_REVIEW.md)を運営者が確認し、正式本文を反映した後、Windowsのビルド用ファイルを更新して署名準備へ進みます。現行のプライバシー本文は確認用の`2026-11-03-draft-3`で、リポジトリーの配布承認フラグは`0`です。準備資料は[作業一覧](WAITING_FOR_APPLE.md)、掲載文案は[App Store掲載準備](STORE_LISTING.md)にまとめています。
+11月4日、運営者から「文面OK」と明示の承認を受け、[確認済みの公開文書](PUBLIC_DOCUMENTS_REVIEW.md)の3本文を店舗設定へ正式反映しました。利用規約・プライバシーポリシーの版は`2026-11-04-1`で、リポジトリーの配布承認フラグは`1`です。既存会員の旧版への同意記録は上書きしていません。受領した正式ロゴを基にしたアイコンもリポジトリーへ反映しました。次は[今回のWindows更新手順](#今回のwindows環境を更新する)で最新ビルド入力とPC・EASの承認フラグを更新し、最終設定を照合して署名付きビルドへ進みます。これらのWindows・EAS側の更新と、Render上の正式本文への切替は未確認です。準備資料は[作業一覧](WAITING_FOR_APPLE.md)、掲載文案は[App Store掲載準備](STORE_LISTING.md)にまとめています。
 
 2026年11月1日までに、所有者からFirebase・Supabase・Renderへの接続、SDK 58更新後のiPhone起動、会員登録、基本的なスタンプ付与、2端末の会員QR読み取り、お知らせの追加・編集、ログイン保持・再ログイン・パスワード再設定、スタッフ権限の追加・停止について成功報告を受けています。こちらが実機や公開APIを直接操作した確認ではありません。署名付きビルド・TestFlight・Appleへの申請は未実施です。実施済みと未確認の範囲は[検証結果](VALIDATION.md)を参照してください。
 
@@ -52,13 +52,13 @@ Expoアカウントは無料で作成できます。EAS Buildには無料枠が�
 
 本番の店舗情報・正式条件・公開文書は `server/config/tamaya.json` にあります。配色は `src/config/shop.ts`、接続設定は直下の `.env.example` を参照してください。
 
-利用規約・プライバシーポリシー・サポートページの正式化に向けた本文は、[公開文書の最終確認案](PUBLIC_DOCUMENTS_REVIEW.md)に用意しました。提供事業者の未確認のログ保存日数は推測で埋めず、各社の保存・削除条件に従う旨を記載しています。全ログの固定日数の確認やSupabase Proへの先行変更を、文面作成・署名準備の一律の前提にはしていません。バックアップの取得担当・保管先・期間は、実際のお客様の運用開始前に決めます。
+利用規約・プライバシーポリシー・サポートページの本文は、[確認済みの公開文書](PUBLIC_DOCUMENTS_REVIEW.md)を基に運営者の承認を受け、店舗設定へ正式反映しました。提供事業者の未確認のログ保存日数は推測で埋めず、各社の保存・削除条件に従う旨を記載しています。全ログの固定日数の確認やSupabase Proへの先行変更を、文面作成・署名準備の一律の前提にはしていません。バックアップの取得担当・保管先・期間は、実際のお客様の運用開始前に決めます。
 
 ### アプリアイコン
 
-「玉」の文字と深緑の円を使う `assets/app-icon.png` を作成し、`app.config.ts` へ設定済みです。1024×1024の不透明PNGです。既存の店舗ロゴを模倣・流用したものではありません。
+旧仮アイコンとして、「玉」の文字と深緑の円を使う1024×1024の不透明PNGを作成し、`app.config.ts`から`assets/app-icon.png`を参照する設定を用意しました。
 
-11月4日、所有者は掲載名を「むさしの玉屋」、アイコンを店舗の正式ロゴへ変更することを選択しました。正式ロゴの画像はまだ受領しておらず、現在の`assets/app-icon.png`は上記の仮デザインのままです。原本を受領後、1024×1024の不透明PNGへ整え、同じファイルへ反映します。角を丸く切り抜く必要はありません。設定は `npx expo config --json` で確認できます。
+11月4日、所有者が掲載名を「むさしの玉屋」、アイコンを店舗の正式ロゴへ変更することを選択し、生成りの背景に赤い店印のロゴ画像を添付しました。この画像を基に画像生成ツールで用意した1254×1254の不透明PNGを`assets/app-icon.png`へ反映しました。原本と同一のピクセルであるという扱いにはしていません。Expo SDK 58の実際のiOSアイコン生成処理で、1024×1024の全ピクセルが不透明なAppIconを生成できることを確認しています。Windows側への反映は未確認です。設定は `npx expo config --json` で確認できます。
 
 ## 4．Apple Developer Programへ登録する
 
@@ -145,6 +145,84 @@ npx eas-cli@25.3.0 env:list production
 AppleやExpoの画面は更新されます。ここに書いた日本語・英語の名称と多少異なる場合は、同じ意味の項目を確認してください。
 
 ## 6．Windowsで、公開作業に使う最新版のソースを用意する
+
+### 今回のWindows環境を更新する
+
+所有者のPCではSDK 58の依存を導入済みです。今回は6ファイルと承認フラグを更新するため、`npm ci`で部品を入れ直す必要はありません。以下のコマンドを1つずつ実行し、エラーが出た場合はその表示を確認してから続けます。PCの`.env`全体やサーバーの秘密設定は上書きしません。
+
+アプリ直下へ移動します。
+
+```bat
+cd /d "%USERPROFILE%\Downloads\tamaya-server-setup\tamayaapp-main"
+```
+
+GitHubの最新版から、ビルドに使う6ファイルを既存の保存先へ更新します。
+
+```bat
+curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/main/app.json" -o app.json
+```
+
+```bat
+curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/main/app.config.ts" -o app.config.ts
+```
+
+```bat
+curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/main/.easignore" -o .easignore
+```
+
+```bat
+curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/main/eas.json" -o eas.json
+```
+
+```bat
+curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/main/server/config/tamaya.json" -o "server\config\tamaya.json"
+```
+
+```bat
+curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/main/assets/app-icon.png" -o "assets\app-icon.png"
+```
+
+既存の`.env`を開きます。
+
+```bat
+notepad .env
+```
+
+`RELEASE_BUSINESS_APPROVED`の既存行だけを`RELEASE_BUSINESS_APPROVED=1`へ変更して保存します。すでに`1`ならその値を保持します。他の接続設定や`EXPO_IOS_BUNDLE_IDENTIFIER=jp.oneeight.tamaya.members`の行は保持します。
+
+同じ黒い画面で、ZIP利用時のEAS設定を行います。
+
+```bat
+set "EAS_NO_VCS=1"
+```
+
+```bat
+set "EAS_PROJECT_ROOT=%CD%"
+```
+
+今回の文面承認に基づき、EASのproduction環境も承認済みへ更新します。Bundle IDや他の登録済み接続設定は再登録しません。
+
+```bat
+npx eas-cli@25.3.0 env:set production --name RELEASE_BUSINESS_APPROVED --value 1 --visibility sensitive --scope project --non-interactive
+```
+
+配布前の設定を確認します。
+
+```bat
+npm run production:check
+```
+
+すべて成功してから、署名付きiOSアプリのビルドへ進みます。Appleへのログイン・証明書等の案内は[第9節](#9署名付きのiphoneアプリをクラウドで作る)を参照します。
+
+```bat
+npx eas-cli@25.3.0 build --platform ios --profile production
+```
+
+この手順ではビルドまで進め、TestFlight・App Storeへの送信は行いません。
+
+開発側では、iOS向けのproduction exportと配布前チェックが成功しています。実際のEAS CLI 25.3.0のアーカイブ処理で新しいアイコンと正式な店舗設定が入り、`.env`・サーバー本体・文書・deploymentファイルが除外されること、アーカイブ内でもproductionの公開設定を使った配布前チェックが成功することを確認しました。所有者のWindowsでの更新・EASリモートの承認フラグ更新・署名付きクラウドビルドの成功とは分けて記録します。
+
+### 初回導入時の参考手順
 
 **本番化が済んだ最新版のファイル一式**を使います。以前ダウンロードした端末内デモのまま、設定ファイルだけを足しても、本番機能は追加されません。ソースの受け取り・更新が済んでから以下へ進みます。
 
@@ -238,7 +316,7 @@ npx eas-cli@25.3.0 project:info
 
 2026年11月2日、所有者のWindows画面で`@oneight/tamaya-members-demo`の作成・連携と、`project:info`の成功を確認しました。実際のUUIDは`b84c88d0-b923-4a2a-b144-9fe5f0528f8d`です。リポジトリーの`app.json`と設定例もこの値へそろえています。
 
-その後、所有者の画面で「Uploaded env file to production.」と登録後の9項目の一覧を確認しました。公開の7項目は設定ファイルと一致し、EASのUUIDと運用確認フラグはSensitiveとして伏せられています。11月3日のApple側のBundle ID登録に続き、11月4日にはEASへ同じ値を追加でき、10項目の一覧のうち表示された8項目が設定と一致することを確認しました。伏せ字の2項目の実値を再確認したとは扱いません。PCで解決される設定、公開文書の承認、証明書・署名付きビルドは引き続き準備事項です。以下は公開接続設定の登録に使用した手順で、登録済みの設定を理由なく登録し直す必要はありません。
+その後、所有者の画面で「Uploaded env file to production.」と登録後の9項目の一覧を確認しました。公開の7項目は設定ファイルと一致し、EASのUUIDと運用確認フラグはSensitiveとして伏せられています。11月3日のApple側のBundle ID登録に続き、11月4日にはEASへ同じ値を追加でき、10項目の一覧のうち表示された8項目が設定と一致することを確認しました。伏せ字の2項目の実値を再確認したとは扱いません。その後に公開文書の明示承認とリポジトリーへの正式反映が完了しました。次はPCで解決される設定と、PC・EASの承認フラグ更新、証明書・署名付きビルドを準備します。以下は公開接続設定の登録に使用した手順で、登録済みの接続設定やBundle IDを理由なく登録し直す必要はありません。
 
 現在のアプリ直下の黒い画面で、公開接続設定だけをまとめたファイルを取得します。
 
@@ -260,7 +338,7 @@ npx eas-cli@25.3.0 env:list production
 
 上記の固定コミットのファイルは、11月2日に使ったFirebaseの公開設定、APIのURL、店舗ID、EASのUUID、運用確認待ちのフラグの9項目です。当時はBundle IDが未確定だったため含めていません。`env:push`では`EXPO_PUBLIC_*`はPublic、それ以外はSensitiveとして登録され、一部の値は一覧で伏せられます。通常の`.env`全体をアップロードする操作ではなく、ファイルにない変数は削除しません。
 
-現在のリポジトリーの`deployment/eas-production.env`は、登録済みBundle IDを加えた10項目へ更新しています。今回の所有者は[Bundle IDの追加操作](#登録済みbundle-idをpcとeasへ反映する)も完了済みのため、ファイルの再取得・再アップロードや`env:set`の再実行は不要です。リポジトリーの`RELEASE_BUSINESS_APPROVED`は`0`のままで、公開文書の最終確認・正式反映を終えてから別途設定します。EASの実値は一覧で伏せられているため、今の値を読み取れたとは扱いません。
+現在のリポジトリーの`deployment/eas-production.env`は、登録済みBundle IDを加えた10項目で、公開文書の承認に基づき`RELEASE_BUSINESS_APPROVED=1`へ更新しています。今回の所有者は[Bundle IDの追加操作](#登録済みbundle-idをpcとeasへ反映する)も完了済みのため、Bundle IDや他の接続設定の再登録は不要です。次に変更するのはPCとEASの承認フラグで、これらの実環境への反映はまだ確認していません。EASの値は以前の一覧で伏せられており、承認後の値を読み取れたとは扱いません。
 
 ## 8．公開用ビルドの設定を確認する
 
