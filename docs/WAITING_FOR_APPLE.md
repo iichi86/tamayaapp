@@ -1,6 +1,6 @@
-# Appleの登録確認を待つ間の準備
+# Apple登録後へ引き継ぐ準備
 
-更新日：2026年11月3日。Apple Developerアプリは11月2日の画面で「登録保留中」が最後の確認です。以後のメンバーシップ有効化、Bundle IDの実登録、署名付きビルド、TestFlight送信はまだ確認していません。
+更新日：2026年11月3日。所有者のApple Developerアプリで「チーム／Account Holder」、PCでIdentifiers管理画面へのアクセスと`Tamaya Members`／`jp.oneeight.tamaya.members`の登録を確認しました。以前の「登録保留中」から進んでいます。確認は所有者の画面に基づくもので、開発側がAppleのAPIへ接続して照会した結果ではありません。次はPCとEASのproduction環境へ同じBundle IDを反映します。証明書、署名付きビルド、App Store Connectのアプリ作成、TestFlight送信は未実施です。
 
 ## 開発側で準備したもの
 
@@ -44,7 +44,7 @@ curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/84c1
 curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/84c1af5afdeadc199e0bd905d1926d4b25cb6106/eas.json" -o eas.json
 ```
 
-取得エラーが出た場合は、その表示を確認してから続けます。今回はビルド用の2ファイルの更新です。署名付きビルドは、Appleの有効化と正式な識別子・公開文書の確定後に行います。
+取得エラーが出た場合は、その表示を確認してから続けます。この2ファイルに加えて、登録済みBundle IDをアプリの設定とPC・EASの環境変数へそろえます。署名付きビルドは、これらの設定と公開文書の確認後に行います。
 
 ## 4．掲載名・アイコンを確認する
 
@@ -58,6 +58,6 @@ App Store用の実機スクリーンショットは、署名付きアプリが�
 
 有料契約はまだ選択・実行していません。実際のお客様の会員運用を始める前に、取得担当、保存先、日次取得、復元手順を決めます。保管7日分は手動運用の提案で、採用済みの規則ではありません。
 
-## Appleの有効化後に行うこと
+## 次に行うこと：登録済みBundle IDの設定と署名準備
 
-Appleからの案内に沿って登録を完了し、Identifiersを利用できることを確認します。その後に正式なBundle IDと署名設定をそろえます。公開文書の正式化・運営者による確認も残っています。配布前チェックの未解決項目を残したまま、承認フラグだけを変更する手順にはしません。
+Identifiersの利用とBundle ID登録は所有者の画面で確認済みです。PCの直下`.env`とEASのproduction環境の`EXPO_IOS_BUNDLE_IDENTIFIER`を`jp.oneeight.tamaya.members`へ設定し、Expoの最終設定でも一致を確認します。このPC・EAS側の反映は未確認です。詳しい流れは[配布手順](APP_STORE.md#5アプリの識別子を確認しapp-store-connectに登録する)を参照してください。その後、公開文書の正式化・運営者確認と署名設定をそろえます。配布前チェックの未解決項目を残したまま、承認フラグだけを変更する手順にはしません。

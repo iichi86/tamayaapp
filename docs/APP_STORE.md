@@ -4,7 +4,7 @@
 
 **今回の作業範囲は、TestFlightへ送信する前の準備です。** 公開文書、正式な識別子、所有者のEAS・Appleの設定をそろえ、署名付きビルドを準備するところまで進めます。第10節以降は、その後に公開へ進む際の参考手順です。今回、TestFlight送信・App Store申請・有料契約は実行していません。
 
-11月2日の所有者のApple Developerアプリでは「登録保留中」と表示されています。確認待ちの間に進める作業は[待機中の準備一覧](WAITING_FOR_APPLE.md)、掲載名・説明文等の案は[App Store掲載準備](STORE_LISTING.md)へまとめています。所有者による登録手続きの開始と、メンバーシップの有効化は分けて確認します。
+2026年11月3日、所有者のApple Developerアプリで「チーム／Account Holder」の表示、PCでIdentifiers管理画面へのアクセス、その後の一覧で`Tamaya Members`／`jp.oneeight.tamaya.members`の登録を確認しました。これらは所有者の画面に基づく確認で、開発側がAppleのAPIへ接続して照会した結果ではありません。次はPCとEASのproduction環境へ同じBundle IDを設定します。証明書・署名付きビルド・App Store Connectのアプリ作成・TestFlight送信は未実施です。準備資料は[作業一覧](WAITING_FOR_APPLE.md)、掲載文案は[App Store掲載準備](STORE_LISTING.md)にまとめています。
 
 2026年11月1日までに、所有者からFirebase・Supabase・Renderへの接続、SDK 58更新後のiPhone起動、会員登録、基本的なスタンプ付与、2端末の会員QR読み取り、お知らせの追加・編集、ログイン保持・再ログイン・パスワード再設定、スタッフ権限の追加・停止について成功報告を受けています。こちらが実機や公開APIを直接操作した確認ではありません。署名付きビルド・TestFlight・Appleへの申請は未実施です。実施済みと未確認の範囲は[検証結果](VALIDATION.md)を参照してください。
 
@@ -33,7 +33,7 @@ Expoアカウントは無料で作成できます。EAS Buildには無料枠が�
 
 正式条件は500円以上のお会計で1日1スタンプ、5個でランダムの生菓子1つ、90日有効、交換時の追加購入不要、他の割引との併用可です。店舗スタッフが生菓子を選んでお渡しします。
 
-配置後の確認結果は[検証結果](VALIDATION.md)へ記録します。確認済みの操作を理由なく繰り返す必要はありません。特典の実機での発行・交換、退会などの未確認項目は残作業として明記し、ローカルの認証エミュレーターやChromiumでの成功を実機確認済みとは扱いません。
+配置後の確認結果は[検証結果](VALIDATION.md)へ記録します。確認済みの操作を理由なく繰り返す必要はありません。確認用別会員の退会完了と削除後のログイン拒否は所有者の実機画面・報告で確認済みです。特典の実機での発行・交換は未確認として明記し、ローカルの認証エミュレーターやChromiumでの成功を実機確認済みとは扱いません。
 
 公開版では `EXPO_PUBLIC_APP_MODE=production` を使用します。デモメニューによるスタッフ切り替えや架空の会員は使いません。`npm run production:check` が不足を表示する間は配布へ進みません。
 
@@ -58,7 +58,7 @@ Expoアカウントは無料で作成できます。EAS Buildには無料枠が�
 
 ## 4．Apple Developer Programへ登録する
 
-今回の次の操作は、ご本人のiPhoneでApp Storeの「Apple Developer」（提供元Apple）をインストールし、アプリの「アカウント」からご本人のApple Accountへサインインして、登録案内を確認するところまでです。個人登録では通常、App Storeの販売元に法的な氏名が表示され、屋号だけを販売元にする方法とは異なります。契約は年額の有料登録なので、名義・実際の金額・更新条件を公式画面で確認してから判断します。
+今回の所有者は登録手続きを進め、11月3日にIdentifiersへアクセスして下記のApp IDを登録できました。新規登録手順の再実施は不要です。以下は登録前の参考手順です。個人登録では通常、App Storeの販売元に法的な氏名が表示されます。契約の金額・更新条件は所有者が公式画面で確認します。
 
 まず、予定する公開名義で登録済みかを確認します。登録済みなら[Apple Developerのアカウント画面](https://developer.apple.com/account/)で利用できるチーム・権限を確認し、以下の新規登録手順は省きます。未登録で、本番化と公開方針が決まった場合に公式の[登録案内](https://developer.apple.com/programs/enroll/)を開きます。新規の有料契約は、所有者が名義・料金・更新条件を確認して選びます。
 
@@ -72,11 +72,50 @@ Expoアカウントは無料で作成できます。EAS Buildには無料枠が�
 
 ## 5．アプリの識別子を確認し、App Store Connectに登録する
 
-アプリの内部の識別子を**Bundle ID**と呼びます。`app.json`に残る`jp.tamaya.members.demo`は旧デモ用です。公開版では、直下`.env`とEASのproduction環境の `EXPO_IOS_BUNDLE_IDENTIFIER` に、今回の正式な識別子を設定します。
+アプリの内部の識別子を**Bundle ID**と呼びます。今回の登録値は **`jp.oneeight.tamaya.members`** です。公開版では`app.json`の`ios.bundleIdentifier`、直下`.env`とEASのproduction環境の`EXPO_IOS_BUNDLE_IDENTIFIER`を、この値にそろえます。所有者のPCとEASへの今回の値の反映は、まだ確認していません。
 
-例えば `jp.oneeight.tamaya.members` のような形式です。これは未確定の候補で、利用できることを確認した値ではありません。既存の正式な識別子があれば先に確認し、今回のAppleチームで登録・利用できる一意の値を確定します。使用済みなら別の値を選びます。`app.config.ts`がこの環境変数を最終的なiOS識別子へ反映します。`npx expo config --json`で `ios.bundleIdentifier` を確認してください。使い始めたあとで変えると別のアプリとして扱われます。
+11月3日の所有者のIdentifiers一覧に、名前`Tamaya Members`、識別子`jp.oneeight.tamaya.members`が表示されました。候補段階を終え、今回のアプリではこの登録値を使用します。`app.config.ts`が環境変数を最終的なiOS識別子へ反映するため、PCとEASの両方を更新してから`npx expo config --json`で`ios.bundleIdentifier`を確認します。使い始めたあとで変えると別のアプリとして扱われます。
+
+### 登録済みBundle IDをPCとEASへ反映する
+
+所有者のWindows側で、これまで使っているアプリ直下へ移動します。
+
+```bat
+cd /d "%USERPROFILE%\Downloads\tamaya-server-setup\tamayaapp-main"
+```
+
+ZIPで用意したPCでは、同じ黒い画面で次を設定します。別の黒い画面を開いた場合は、その画面でも設定します。
+
+```bat
+set "EAS_NO_VCS=1"
+set "EAS_PROJECT_ROOT=%CD%"
+```
+
+`.env`をメモ帳で開きます。
+
+```bat
+notepad .env
+```
+
+既存の`EXPO_IOS_BUNDLE_IDENTIFIER=`の行を、`EXPO_IOS_BUNDLE_IDENTIFIER=jp.oneeight.tamaya.members`へ置き換えて保存します。行がない場合は1行追加します。同じ設定名を重複させたり、他の接続設定を消したりしません。ファイル名は`.env`のまま保存し、`.env.txt`にはしません。
+
+同じ黒い画面で、EASのproduction環境へこの1項目を追加・更新します。
+
+```bat
+npx eas-cli@25.3.0 env:set production --name EXPO_IOS_BUNDLE_IDENTIFIER --value jp.oneeight.tamaya.members --visibility plaintext --scope project --non-interactive
+```
+
+登録した値を一覧で確認します。
+
+```bat
+npx eas-cli@25.3.0 env:list production
+```
+
+`EXPO_IOS_BUNDLE_IDENTIFIER=jp.oneeight.tamaya.members`が表示されることを確認します。この識別子は公開設定として扱えます。CLI 25.3.0のヘルプと公開ソースで、この`env:set`が作成・更新に対応し、上記フラグが利用できることを確認しています。既存のプロジェクト連携を利用するため、`eas init`やアプリ・認証アカウントの作り直しは不要です。`RELEASE_BUSINESS_APPROVED`の値はこの操作では変更しません。
 
 ### Apple側にBundle IDを登録する
+
+今回の登録は完了済みです。以下は参照用で、同じApp IDを作り直す手順には進みません。登録時はApp IDs→App、Descriptionは`Tamaya Members`、Bundle IDはExplicitを選択しました。現在のメール・パスワード認証と会員QR読み取りの実装では、Capabilitiesを追加する必要はありません。
 
 1. [Apple Developerのアカウント画面](https://developer.apple.com/account/)に入ります。
 2. 「Certificates, Identifiers & Profiles」から「Identifiers」を開き、追加操作を選びます。
@@ -193,7 +232,7 @@ npx eas-cli@25.3.0 project:info
 
 2026年11月2日、所有者のWindows画面で`@oneight/tamaya-members-demo`の作成・連携と、`project:info`の成功を確認しました。実際のUUIDは`b84c88d0-b923-4a2a-b144-9fe5f0528f8d`です。リポジトリーの`app.json`と設定例もこの値へそろえています。
 
-その後、所有者の画面で「Uploaded env file to production.」と登録後の9項目の一覧を確認しました。公開の7項目は設定ファイルと一致し、EASのUUIDと運用確認フラグはSensitiveとして伏せられています。伏せ字の実際の値をこの画面から確認したとは扱いません。EASのプロジェクト・公開接続設定の準備は進みましたが、正式なBundle ID、公開文書の承認、Appleへの登録・署名付きビルドは未完了です。以下は今回使用した登録手順で、同じ設定を理由なく登録し直す必要はありません。
+その後、所有者の画面で「Uploaded env file to production.」と登録後の9項目の一覧を確認しました。公開の7項目は設定ファイルと一致し、EASのUUIDと運用確認フラグはSensitiveとして伏せられています。伏せ字の実際の値をこの画面から確認したとは扱いません。11月3日にはApple側のBundle ID登録まで確認できましたが、PCとEASへの識別子設定、公開文書の承認、証明書・署名付きビルドは未完了です。以下は公開接続設定の登録に使用した手順で、登録済みの設定を理由なく登録し直す必要はありません。
 
 現在のアプリ直下の黒い画面で、公開接続設定だけをまとめたファイルを取得します。
 
@@ -213,7 +252,9 @@ npx eas-cli@25.3.0 env:push production --path .env.eas.production
 npx eas-cli@25.3.0 env:list production
 ```
 
-ファイルはFirebaseの公開設定、APIのURL、店舗ID、EASのUUID、運用確認待ちのフラグの9項目です。`EXPO_PUBLIC_*`はPublic、それ以外はSensitiveとして登録され、一部の値は一覧で伏せられます。通常の`.env`全体をアップロードする操作ではありません。ファイルにない変数は削除しません。未確定のBundle IDは空値として登録せず、正式な値を決めてから追加します。`RELEASE_BUSINESS_APPROVED`は`0`のままで、文書・運用の確認を終えてから別途設定します。上書き確認やアカウント共通変数との競合が出た場合は、その内容を確認してから続けます。
+上記の固定コミットのファイルは、11月2日に使ったFirebaseの公開設定、APIのURL、店舗ID、EASのUUID、運用確認待ちのフラグの9項目です。当時はBundle IDが未確定だったため含めていません。`env:push`では`EXPO_PUBLIC_*`はPublic、それ以外はSensitiveとして登録され、一部の値は一覧で伏せられます。通常の`.env`全体をアップロードする操作ではなく、ファイルにない変数は削除しません。
+
+現在のリポジトリーの`deployment/eas-production.env`は、登録済みBundle IDを加えた10項目へ更新しています。すでに9項目を登録済みの所有者は、ファイルの再取得・再アップロードを繰り返さず、[登録済みBundle IDの設定手順](#登録済みbundle-idをpcとeasへ反映する)で1項目を追加・更新します。`RELEASE_BUSINESS_APPROVED`は`0`のままで、文書・運用の確認を終えてから別途設定します。上書き確認やアカウント共通変数との競合が出た場合は、その内容を確認してから続けます。
 
 ## 8．公開用ビルドの設定を確認する
 

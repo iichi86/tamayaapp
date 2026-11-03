@@ -4,7 +4,7 @@
 
 この文書は、端末内だけのデモを確認した後、Firebaseでログインし、管理サーバーを通じてSupabaseの共有データベースを使う構成へ進むための案内です。正式な条件は[運用ルール](OPERATING_RULES.md)にまとめています。
 
-Apple Developer Programは11月2日の所有者の画面で「登録保留中」であり、その後の有効化は未確認です。確認待ちの間に、[次に行う作業と準備済み資料](WAITING_FOR_APPLE.md)を整理しました。掲載文案、バックアップ・復元手順、90日削除、ビルドへ渡すファイルの整理を準備し、Renderへの反映は下記の所有者の画面・報告として記録しています。
+2026年11月3日、所有者のApple Developerアプリで「チーム／Account Holder」、PCでIdentifiers管理画面へのアクセスと`Tamaya Members`／`jp.oneeight.tamaya.members`の登録を確認しました。確認は所有者の画面に基づき、開発側がAppleのAPIへ接続して照会した結果ではありません。次はPCとEASのproduction環境へ同じBundle IDを設定します。証明書・署名付きビルド・App Store Connectのアプリ作成・TestFlight送信は未実施です。[次に行う作業と準備済み資料](WAITING_FOR_APPLE.md)に掲載文案、バックアップ・復元手順、90日削除、ビルド用ファイルの整理をまとめています。
 
 **ソースの実装・ローカル検証と、実際の外部サービスへの配置は別です。** Firebaseの`tamayaapp`プロジェクトとWebアプリは作成され、公開設定4項目をアプリの設定例へ反映しました。Firebase Adminの秘密鍵JSONは所有者のPCへ保存されています。Supabaseでは所有者が10テーブルを作成し、全テーブルのRLSが有効と確認しました。2026年10月31日、専用DBユーザーの作成が完了し、Renderの公開URL`https://tamayaapp.onrender.com`について、所有者のChromeで`/health`が`status=ok`、`authMode=firebase`と表示されました。続けて所有者のiPhoneでアプリの起動・会員登録が進み、SQL Editorによる初回オーナー設定完了の報告を受けました。
 
@@ -45,7 +45,7 @@ Apple Developer Programは11月2日の所有者の画面で「登録保留中」
 4. **最初のオーナーになるアカウントを作り、メール確認を完了する。** そのUIDをサーバーの初回設定で登録します。以後のスタッフ追加・停止はオーナーが店舗用画面で行います。
 5. **公開文書と実端末での最終確認を行う。** 運営名義、問い合わせ、実際の委託先・保存地域・保管期間を含むデータの扱いが実態に合っていることを確認し、お客様側と店舗側の別端末で試します。
 
-Appleへの申請に進む時点では、別途Apple Developer Programの本人・事業者登録、契約・料金への同意、Appleが求める確認操作が必要です。手順は[App Store公開手順](APP_STORE.md)にあります。今回はその前の段階です。
+11月3日にはAppleのIdentifiersを利用して上記のApp IDを登録できました。次はPCとEASのBundle ID設定、公開文書の正式化・運営者確認、証明書と署名付きビルドの準備です。Apple側で追加の同意や確認を求められた場合は所有者が公式画面で対応します。手順は[App Store公開手順](APP_STORE.md)にあります。TestFlight送信やApp Store申請は今回の作業には含めません。
 
 ## 1．最新版のソースを用意する
 
