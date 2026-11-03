@@ -22,7 +22,7 @@
 Windowsキーを押しながらRを押し、`cmd`と入力してEnterを押します。黒い画面で次の1行を実行します。
 
 ```bat
-cd /d "%USERPROFILE%\Downloads\tamaya-server-setup\tamayaapp-main" && curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/main/scripts/prepare-ios-build.mjs" -o "scripts\prepare-ios-build.mjs" && node scripts\prepare-ios-build.mjs --build --submit
+cd /d "%USERPROFILE%\Downloads\tamaya-server-setup\tamayaapp-main" && curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/6ffe8dfb9391e5a633eafb31d9462c53dc2a43ae/scripts/prepare-ios-build.mjs" -o "scripts\prepare-ios-build.mjs" && node scripts\prepare-ios-build.mjs --build --submit
 ```
 
 このコマンドは、用意した準備スクリプトを取得して実行します。スクリプトの内部では検証済みコミットのファイルを取得し、内容のハッシュが一致してから更新します。既存の接続設定を保持し、今回承認された設定を更新して、チェックとビルドへ進みます。ビルド成功後はTestFlightへのアップロードも自動で進めます。ダウンロードや確認に失敗した場合はエラーを表示して止まります。
