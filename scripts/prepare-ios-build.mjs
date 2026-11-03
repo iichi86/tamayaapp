@@ -160,7 +160,8 @@ async function runAction(action, { root, env, submit = false }) {
 }
 
 async function atomicWrite(path, bytes, mode = 0o600) {
-  const temporary = join(dirname(path), `.tamaya-update-${randomUUID()}.tmp`);
+  // Intermediate .env bytes remain excluded from both Git and EAS if interrupted.
+  const temporary = join(dirname(path), `.env.tamaya-update-${randomUUID()}.tmp`);
   try {
     await writeFile(temporary, bytes, { flag: 'wx', mode });
     await rename(temporary, path);

@@ -98,7 +98,7 @@ test('a failed local check restores original bytes and does not call EAS', async
   assert.deepEqual(actions, ['check']);
   assert.deepEqual(await snapshot(root), before);
   const names = await readdir(root);
-  assert.ok(!names.some(name => name.startsWith('.tamaya-update-')));
+  assert.ok(!names.some(name => name.startsWith('.env.tamaya-update-')));
 });
 
 test('an EAS failure retains the valid local update and never starts a build', async t => {
