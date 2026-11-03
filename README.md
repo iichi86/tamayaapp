@@ -4,6 +4,8 @@ React Native・Expo SDK 58・TypeScriptのiPhone向け会員アプリです。�
 
 **まず読む文書： [本番接続版の引継ぎ・Windowsでの準備手順](docs/PRODUCTION_HANDOVER.md)**
 
+公開までの次の操作は[段階別の公開手順](docs/RELEASE_STEPS.md)を参照してください。PCの6ファイル・設定・チェック・ビルドと成功後のTestFlightアップロードを一括で進める準備スクリプトを用意しました。現在は署名付きビルドの実行前です。
+
 公開用の規約・データの取り扱いは、運営者が11月4日に承認した[公開文書](docs/PUBLIC_DOCUMENTS_REVIEW.md)にまとめ、店舗設定の正式版`2026-11-04-1`へ反映しました。根拠と経過は[確認記録](docs/LEGAL_REVIEW.md)を参照してください。
 
 Appleの管理画面へのアクセスとBundle ID登録まで進みました。[準備済みの資料と次の作業](docs/WAITING_FOR_APPLE.md)を参照してください。App Store掲載文案、バックアップ・復元、90日削除、ビルド用ファイルの整理を準備しています。

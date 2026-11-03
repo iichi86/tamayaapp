@@ -2,7 +2,7 @@
 
 この手順書の目標は、お客様がApp Storeで玉屋のアプリを見つけ、無料でインストールして使える状態にすることです。Expo Go内で試作を開くこととは、作業が異なります。Windowsからでも、ExpoのEAS Buildというクラウド上の仕組みでiPhoneアプリを作れます。
 
-**今回の作業範囲は、TestFlightへ送信する前の準備です。** 公開文書、正式な識別子、所有者のEAS・Appleの設定をそろえ、署名付きビルドを準備するところまで進めます。第10節以降は、その後に公開へ進む際の参考手順です。この作業環境からTestFlight送信・App Store申請や新たな有料契約は実行していません。
+**今回の作業範囲は、App Storeでの一般公開までです。** 11月4日の所有者の依頼に基づき、署名付きビルド、TestFlight、掲載情報、審査、公開の順に進めます。現在行う操作と役割は[公開までの段階別手順](RELEASE_STEPS.md)を参照してください。この作業環境からTestFlight送信・App Store申請や新たな有料契約はまだ実行していません。
 
 2026年11月4日更新：Apple側の`Tamaya Members`／`jp.oneeight.tamaya.members`の登録に加え、所有者の画面でEASのproduction環境への同じBundle IDの追加成功と、10項目の一覧を確認しました。表示された8項目の値は公開接続設定と一致し、`EAS_PROJECT_ID`・`RELEASE_BUSINESS_APPROVED`の2項目はSensitiveで伏せられているため実値を再確認したとは扱いません。PCの`.env`保存結果とExpoの最終設定は未確認で、次のビルド準備時に照合します。これらは所有者の画面による確認で、開発側が外部アカウントへ接続して照会した結果ではありません。証明書・署名付きビルド・App Store Connectのアプリ作成・TestFlight送信は未実施です。
 
@@ -131,7 +131,7 @@ npx eas-cli@25.3.0 env:list production
 
 ### App Store Connectにアプリの枠を作る
 
-この枠は、第10節でAppleへアップロードする前までに作成します。EASプロジェクトや署名付きビルドの準備を始める前に、必ず作成しておく必要はありません。今回の「TestFlight送信前まで」の準備では、所有者の設定に合わせて後で行えます。
+今回の標準手順では、第10節のEAS提出処理からアプリの枠を準備します。`eas.json`へ掲載名・日本語・SKU・Bundle IDを設定済みで、初めから同じ値をブラウザーで手入力する必要はありません。以下は、自動準備を使えない場合の参考手順です。
 
 1. [App Store Connect](https://appstoreconnect.apple.com/)の「マイApp／Apps」を開きます。
 2. 追加の「＋」から「新規App／New App」を選びます。
@@ -147,6 +147,8 @@ AppleやExpoの画面は更新されます。ここに書いた日本語・英�
 ## 6．Windowsで、公開作業に使う最新版のソースを用意する
 
 ### 今回のWindows環境を更新する
+
+現在の標準手順は[一括準備コマンド](RELEASE_STEPS.md#最初に実行すること)です。6ファイル取得、必要な環境設定、配布前チェック、公開サーバーの確認、ビルドと成功後のTestFlightアップロードをまとめて進めます。以下はビルドまでの処理を個別に行う場合の参考です。一括処理を使った後に、同じ取得操作を繰り返す必要はありません。
 
 所有者のPCではSDK 58の依存を導入済みです。今回は6ファイルと承認フラグを更新するため、`npm ci`で部品を入れ直す必要はありません。以下のコマンドを1つずつ実行し、エラーが出た場合はその表示を確認してから続けます。PCの`.env`全体やサーバーの秘密設定は上書きしません。
 
@@ -390,13 +392,13 @@ npx eas-cli@25.3.0 build --platform ios --profile production
 
 ## 10．App Store Connectへアップロードし、TestFlightで確認する
 
-成功したビルドを提出します。
+段階1の成功したビルドを提出します。今回の設定では、必要なApp Store Connectのアプリ枠と内部テストの準備もEASが進めます。対象が今回の最新iOSビルドであることを確認して、次を実行します。
 
 ```bat
-npx eas-cli@25.3.0 submit --platform ios --profile production
+npx eas-cli@25.3.0 submit --platform ios --profile production --latest --auto-testflight-setup
 ```
 
-提出するファイルの取得元を聞かれたら、EASで作成したビルドを選ぶ項目（`Select a build from EAS`）を選びます。続く一覧で、直前に成功した今回のiOSビルドを選びます。候補は矢印キーで選択し、Enterで決定します。Appleのアプリや認証方法の確認が出たら、今回の名義・Bundle IDに合うものを選びます。
+この指定では最新のiOSビルドを選ぶため、通常は一覧からの手選択を省けます。別のビルドも存在する場合は、対象のIDを確認してから提出します。Appleのアプリや認証方法の確認が出たら、今回の名義・Bundle IDに合うものを選びます。アプリ枠の作成後、掲載名が「むさしの玉屋」であることも確認します。
 
 EAS CLI 25.3.0では、通常、App Store Connect API Keyを使って提出します。これはApple側へのアップロード用の鍵です。使える既存の鍵があれば、その内容を確認して再利用できます。初回に`Generate a new App Store Connect API Key?`と聞かれた場合は、今回のチームで作成する権限があることを確認して作成します。続く役割の選択では、今回のアプリ管理用なら**`APP_MANAGER`**を矢印キーで選んでEnterを押します。すべての質問へ一律に`y`と入力する手順ではありません。
 
