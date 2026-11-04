@@ -17,6 +17,7 @@
   "submit": {
     "production": {
       "ios": {
+        "ascAppId": "6830628549",
         "appName": "むさしの玉屋",
         "language": "ja",
         "sku": "tamaya-members-ios",

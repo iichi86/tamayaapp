@@ -4,6 +4,10 @@
 
 この文書は、端末内だけのデモを確認した後、Firebaseでログインし、管理サーバーを通じてSupabaseの共有データベースを使う構成へ進むための案内です。正式な条件は[運用ルール](OPERATING_RULES.md)にまとめています。
 
+2026年11月4日、所有者のWindows画面で、署名付きiOSアプリの`Build finished`と`Submitted your app to Apple App Store Connect!`、アップロード成功の表示を確認しました。対象はバージョン`1.0.0`・ビルド番号`2`で、App Store ConnectのApp IDは`6830628549`です。Apple側で処理中と案内されており、[TestFlightの対象画面](https://appstoreconnect.apple.com/apps/6830628549/testflight/ios)で処理状況を確認する段階です。こちらがAppleやEASへ直接接続して照会した結果ではありません。TestFlightでのビルド表示・iPhoneへのインストール、App Review提出、一般公開はまだ確認していません。今回のビルド・アップロードをやり直す必要はありません。
+
+次は[現在のTestFlight手順](RELEASE_STEPS.md#今はappleの処理を確認する)へ進みます。以下の11月3日からの記録は、今回のアップロード成功前の準備経過です。
+
 2026年11月3日、所有者のApple Developerアプリで「チーム／Account Holder」、PCでIdentifiers管理画面へのアクセスと`Tamaya Members`／`jp.oneeight.tamaya.members`の登録を確認しました。確認は所有者の画面に基づき、開発側がAppleのAPIへ接続して照会した結果ではありません。次はPCとEASのproduction環境へ同じBundle IDを設定します。証明書・署名付きビルド・App Store Connectのアプリ作成・TestFlight送信は未実施です。[次に行う作業と準備済み資料](WAITING_FOR_APPLE.md)に掲載文案、バックアップ・復元手順、90日削除、ビルド用ファイルの整理をまとめています。
 
 11月4日更新：所有者の画面でEASのproduction環境へのBundle ID追加成功と、`EXPO_IOS_BUNDLE_IDENTIFIER=jp.oneeight.tamaya.members`を含む10項目の一覧を確認しました。表示された8項目の値は公開接続設定と一致し、`EAS_PROJECT_ID`・`RELEASE_BUSINESS_APPROVED`の2項目は伏せ字のため実値を再確認したとは扱いません。Bundle ID設定の再実行は不要です。PCの`.env`保存結果とExpoの最終設定は、次のビルド準備時に照合します。掲載名は「むさしの玉屋」に決まり、受領した正式ロゴを基にした1254×1254の不透明アイコンをリポジトリーへ反映しました。Expo SDK 58のiOSアイコン生成処理で1024×1024の全不透明AppIconも生成できました。Windows反映は未確認です。

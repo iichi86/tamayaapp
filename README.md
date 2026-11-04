@@ -4,14 +4,16 @@ React Native・Expo SDK 58・TypeScriptのiPhone向け会員アプリです。�
 
 **まず読む文書： [本番接続版の引継ぎ・Windowsでの準備手順](docs/PRODUCTION_HANDOVER.md)**
 
-公開までの次の操作は[段階別の公開手順](docs/RELEASE_STEPS.md)を参照してください。PCの6ファイル・設定・チェック・ビルドと成功後のTestFlightアップロードを一括で進める準備スクリプトを用意しました。現在は署名付きビルドの実行前です。
+公開までの次の操作は[段階別の公開手順](docs/RELEASE_STEPS.md)を参照してください。所有者の画面で署名付きビルドとAppleへのアップロードの成功を確認しました。現在はAppleの処理待ちで、次はTestFlight版をiPhoneへインストールします。ビルド・送信の再実行は不要です。
 
 公開用の規約・データの取り扱いは、運営者が11月4日に承認した[公開文書](docs/PUBLIC_DOCUMENTS_REVIEW.md)にまとめ、店舗設定の正式版`2026-11-04-1`へ反映しました。根拠と経過は[確認記録](docs/LEGAL_REVIEW.md)を参照してください。
 
-Appleの管理画面へのアクセスとBundle ID登録まで進みました。[準備済みの資料と次の作業](docs/WAITING_FOR_APPLE.md)を参照してください。App Store掲載文案、バックアップ・復元、90日削除、ビルド用ファイルの整理を準備しています。
+Appleの管理画面・Bundle ID登録に続き、App Store Connectへのアップロードまで進みました。[準備済みの資料と次の作業](docs/WAITING_FOR_APPLE.md)を参照してください。App Store掲載文案、バックアップ・復元、90日削除、ビルド用ファイルの整理を準備しています。
 
 ## 現在の状態
 
+- 2026年11月4日、所有者のWindows画面で、署名付きiOSアプリの`Build finished`と`Submitted your app to Apple App Store Connect!`、アップロード成功の表示を確認しました。対象はバージョン`1.0.0`・ビルド番号`2`で、App Store ConnectのApp IDは`6830628549`です。Apple側で処理中と案内されており、[TestFlightの対象画面](https://appstoreconnect.apple.com/apps/6830628549/testflight/ios)で処理状況を確認する段階です。こちらがAppleやEASへ直接接続して照会した結果ではありません。TestFlightでのビルド表示・iPhoneへのインストール、App Review提出、一般公開はまだ確認していません。今回のビルド・アップロードをやり直す必要はありません。
+- 以下の日時付き記録は、それぞれの時点の準備状況を保持しています。
 - 本番用のホーム・会員証・特典・お店は管理APIの情報を表示します。会員データはサーバーに保存します。
 - メールとパスワード、メール確認、パスワード再設定、機種変更後の再ログイン、再認証付き退会があります。
 - スタッフ権限はDBで確認し、スタンプ・特典・お知らせ・集計・オーナーの権限管理を行います。
@@ -95,4 +97,4 @@ npm run production:check
 
 本番用の秘密設定は `server/.env.production.example` を参考に用意します。アプリ用は直下の `.env.example` です。**DB接続情報やFirebase管理秘密鍵を、アプリ側の `EXPO_PUBLIC_*`、GitHub、チャットへ入れないでください。**
 
-今後の公開は、実サービスへの接続・運用者の規約確認・実機での2端末確認後、[App Storeの手順](docs/APP_STORE.md)へ進みます。Apple Developer登録・署名・TestFlight送信・App Store申請・有料サービス契約は実施していません。
+今後の公開は、Appleの処理完了とTestFlight版の実機確認、掲載情報・運用準備、審査の順に進みます。[段階別の公開手順](docs/RELEASE_STEPS.md)を参照してください。App Review提出と一般公開はまだ行っていません。

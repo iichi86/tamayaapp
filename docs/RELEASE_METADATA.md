@@ -1,6 +1,6 @@
 # App Store掲載情報の同期準備
 
-更新日：2026年11月4日。EAS CLI 25.3.0に同梱されたMetadataの設定スキーマ・コマンド・読込み処理を確認し、掲載文の手入力を減らすための公開設定を用意しました。App Store Connectへの同期や審査提出は、まだ実行していません。
+更新日：2026年11月4日。署名付きビルド`1.0.0（2）`の作成とApp Store Connectへのアップロードが所有者の画面で確認できました。対象のApp IDは`6830628549`です。掲載文の手入力を減らすため、EAS CLI 25.3.0のMetadata用の公開設定を用意しています。掲載情報の同期やApp Reviewへの審査提出は、まだ実行していません。
 
 ## 用意した公開設定
 
@@ -39,7 +39,7 @@ curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/main
 公開設定を基に、PC内だけで使う`.env.store.config.json`を初期化し、PCの`eas.json`にその保存先を設定します。既存の同名ファイルがある場合は保持します。このコマンドには個人情報やパスワードを入力しません。
 
 ```bat
-node -e "const fs=require('node:fs'); const target='.env.store.config.json'; const eas=JSON.parse(fs.readFileSync('eas.json','utf8')); if(!eas.submit?.production?.ios) throw new Error('production ios submit profile is missing'); if(!fs.existsSync(target)) fs.copyFileSync('deployment/store.config.json',target,fs.constants.COPYFILE_EXCL); eas.submit.production.ios.metadataPath=target; fs.writeFileSync('eas.json',JSON.stringify(eas,null,2)+'\n'); console.log('Local metadata configuration is ready.');"
+node -e "const fs=require('node:fs'); const target='.env.store.config.json'; const eas=JSON.parse(fs.readFileSync('eas.json','utf8')); if(!eas.submit?.production?.ios) throw new Error('production ios submit profile is missing'); if(!fs.existsSync(target)) fs.copyFileSync('deployment/store.config.json',target,fs.constants.COPYFILE_EXCL); eas.submit.production.ios.ascAppId='6830628549'; eas.submit.production.ios.metadataPath=target; fs.writeFileSync('eas.json',JSON.stringify(eas,null,2)+'\n'); console.log('Local metadata configuration is ready.');"
 ```
 
 `.env.store.config.json`は既存の`.gitignore`と`.easignore`の`.env*`に該当し、GitHubへの登録とネイティブビルドのアーカイブから除外されます。実際の審査連絡先やアカウント情報は、必要な段階でこのPC内のファイルへ追加します。チャットへ送る必要はありません。
