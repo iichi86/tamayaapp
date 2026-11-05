@@ -177,7 +177,8 @@ export async function lintMetadata({ root }) {
     const command = process.platform === 'win32' ? 'cmd.exe' : 'npx';
     const commandArgs = process.platform === 'win32' ? ['/d', '/s', '/c', `npx ${args.join(' ')}`] : args;
     const child = spawn(command, commandArgs, { cwd: root,
-      env: { ...process.env, EAS_NO_VCS: '1', EAS_PROJECT_ROOT: root, EXPO_NO_TELEMETRY: '1' },
+      env: { ...process.env, EAS_NO_VCS: '1', EAS_PROJECT_ROOT: root,
+        EXPO_NO_TELEMETRY: '1', DISABLE_EAS_ANALYTICS: '1' },
       stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true });
     const stdout = [];
     let size = 0;
