@@ -1,6 +1,6 @@
 # 掲載文と審査情報をPC内で準備する
 
-更新日：2026年11月5日（日本時間）。対象は「むさしの玉屋」1.0.0、App Store ConnectのApp ID `6830628549`です。TestFlight版のインストール・ログイン・以前のスタンプ表示は、所有者から確認報告を受けています。掲載情報の同期・App Review提出・一般公開は未実施です。
+更新日：2026年11月6日（日本時間）。対象は「むさしの玉屋」1.0.0、App Store ConnectのApp ID `6830628549`です。TestFlight版のインストール・ログイン・以前のスタンプ表示は、所有者から確認報告を受けています。掲載情報の同期・App Review提出・一般公開は未実施です。
 
 2026年11月5日、所有者のWindows画面で、掲載文・連絡先の保存とローカル検証の成功に続き、審査用一般会員の通常APIによる確認と、PC内の審査用ログイン設定の準備完了を確認しました。管理用JSONの選択まで完了しています。これは所有者の実行画面による確認で、開発側が秘密鍵を受領して本番へ接続した結果ではありません。両スクリプトを最初から再実行する必要はありません。次は[掲載画像](APP_STORE_SCREENSHOTS.md)とApple側の必須項目を整えます。掲載同期・審査提出はまだ実行していません。
 
@@ -20,7 +20,7 @@
 黒い画面で次の1行を実行します。取得先は検証済みコミットへ固定しています。
 
 ```bat
-cd /d "%USERPROFILE%\Downloads\tamaya-server-setup\tamayaapp-main" && curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/05fa25c0caa5d3f0155290a537da68bd1955c941/scripts/prepare-store-metadata.mjs" -o "scripts\prepare-store-metadata.mjs" && curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/05fa25c0caa5d3f0155290a537da68bd1955c941/scripts/prepare-review-account.mjs" -o "scripts\prepare-review-account.mjs" && node scripts\prepare-store-metadata.mjs && node scripts\prepare-review-account.mjs --pick-credentials
+cd /d "%USERPROFILE%\Downloads\tamaya-server-setup\tamayaapp-main" && curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/ae36353c7e5ee8878c88a025a0930056183b5fc2/scripts/prepare-store-metadata.mjs" -o "scripts\prepare-store-metadata.mjs" && curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/ae36353c7e5ee8878c88a025a0930056183b5fc2/scripts/prepare-review-account.mjs" -o "scripts\prepare-review-account.mjs" && node scripts\prepare-store-metadata.mjs && node scripts\prepare-review-account.mjs --pick-credentials
 ```
 
 最初のスクリプトで、次の情報だけをPCへ入力します。
@@ -58,25 +58,21 @@ cd /d "%USERPROFILE%\Downloads\tamaya-server-setup\tamayaapp-main" && curl.exe -
 
 ## Appleへの同期と提出
 
-掲載画像は[実機画像の準備](APP_STORE_SCREENSHOTS.md)に沿って用意します。審査連絡先・ログイン情報・著作権・画像をそろえ、Apple側の必須項目を確認してから、所有者のPCで掲載情報を同期します。
+11月6日、同じ3画面を再受領し、画像の内容確認は済んでいます。チャットへの追加送信やZIP化を、この段階の条件にはしません。元画像の寸法は未確認で、Appleへの登録時にアップロード枠の判定と照合します。画像を登録済みとは扱いません。
 
-ZIP展開のPCでは、同じ黒い画面で次を設定します。
+EAS CLI 25.3.0の実装では、スクリーンショット未設定時は画像処理をスキップするため、掲載文・著作権・審査連絡先・ログイン情報を先に同期できます。カテゴリ未設定時も更新をスキップします。今回は初回1.0.0を対象とします。将来の更新では、未指定の段階的リリース設定が既存設定を削除する処理等も再確認し、このコマンドを無条件に流用しません。
 
-```bat
-set "EAS_NO_VCS=1"
-set "EAS_PROJECT_ROOT=%CD%"
-npx eas-cli@25.3.0 metadata:lint --profile production --json
-```
-
-結果は空の配列`[]`であることを確認します。CLI 25.3.0は検証エラーがあっても終了コード0になる場合があるため、終了したことだけを成功の根拠にはしません。空の配列でも、Appleの必須項目や全機能の審査用アクセスが完成した証拠にはなりません。
-
-同期する段階で次を使います。
+所有者のWindows PCで次の1行を実行します。保存済みの私用設定を保持してローカル検証し、成功した場合にAppleへ同期します。現在の連絡先が有効なら再入力は求めません。必要なApple認証はPC内で行います。
 
 ```bat
-npx eas-cli@25.3.0 metadata:push --profile production
+cd /d "%USERPROFILE%\Downloads\tamaya-server-setup\tamayaapp-main" && set "EAS_NO_VCS=1" && set "EAS_PROJECT_ROOT=%USERPROFILE%\Downloads\tamaya-server-setup\tamayaapp-main" && set "DISABLE_EAS_ANALYTICS=1" && node scripts\prepare-store-metadata.mjs && npx eas-cli@25.3.0 metadata:push --profile production
 ```
 
-EAS Metadataはbetaの機能です。同期結果とApple側の表示を確認します。著作権が未入力の公開テンプレートを、そのまま同期しません。同期は掲載情報の更新で、App Reviewへの審査提出や一般公開の操作とは別です。
+`DISABLE_EAS_ANALYTICS=1`は、CLIのAPIエラー解析へ審査連絡先やデモログイン本文を送らないために設定します。`EXPO_NO_TELEMETRY`だけでEASの解析が無効になるとは扱いません。保存済みEASのApp Store Connect API Keyが利用できる場合は、それを使います。
+
+CLIは同期失敗・一部成功でも終了コード0を返す場合があります。**`Store configuration is synced with the app stores.`という成功文と、Apple側の実際の表示**で確認します。エラーが出た場合はその部分を確認し、一部のみ更新された可能性も踏まえて続けます。
+
+この作業環境から所有者のPCやApple管理画面を直接操作する接続はありません。次の実同期は所有者のPCで行う段階であり、開発側で実行・確認済みではありません。同期は掲載情報の更新で、App Reviewへの審査提出・一般公開とは別です。EAS Metadataはbetaのため、Apple側の表示も照合します。
 
 別に確認する項目は、Appのプライバシー、現行の年齢区分質問、カテゴリ、無料価格、配信先、権利情報、ビルド2の選択、審査用の確認方法、公開方法です。プライバシー申告の整理は[掲載準備案](STORE_LISTING.md#appのプライバシー申告用の整理)を使います。実際に表示されたApple側の項目と照合して進めます。
 
