@@ -32,19 +32,19 @@ Appleのアップロード欄で寸法エラーが表示された場合は、そ
 
 所有者が提示した現在の画像欄は、iPhone 6.1／6.3インチ向けです。画面に示された縦向きの受入寸法は`1179 × 2556`または`1206 × 2622`ピクセルです。この欄に合わせる出力は`1179 × 2556`とします。他の端末枠・最大画面の必須条件まで満たすとは扱いません。
 
-画像の送り直しを求めず、所有者のWindows PCにある3枚から登録用のコピーを作る`scripts/prepare-store-screenshots.mjs`を使います。Windows標準のPowerShell・System.Drawingを使い、追加の画像ソフトやnpm依存の導入は不要です。選択するのは画像3枚で、Firebase管理用JSONや私用の設定ファイルではありません。
+画像の送り直しを求めず、所有者のWindows PCにある3枚から登録用のコピーを作る`scripts/prepare-store-screenshots.mjs`を使います。PowerShellはファイル選択だけに使い、読み込み・拡大縮小・PNG出力は、SDK 58の導入済み画像ライブラリで行います。追加の画像ソフトやnpm依存の導入は不要です。選択するのは画像3枚で、Firebase管理用JSONや私用の設定ファイルではありません。
 
 元画像は上書きせず、縦横比を保って指定寸法へ収め、余る部分をアプリの背景色`#F5F2E9`で埋めます。画面の切り取り・文字や数値の描き直しは行いません。不透明PNGの新しいコピーをデスクトップの別フォルダーへ保存し、生成ファイルを検証してからフォルダーを開きます。
 
 Windowsの黒い画面で、次の1行を実行します。
 
 ```bat
-cd /d "%USERPROFILE%\Downloads\tamaya-server-setup\tamayaapp-main" && curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/4278e65129bd3385ce4340abb0c38493c99ff72c/scripts/prepare-store-screenshots.mjs" -o "scripts\prepare-store-screenshots.mjs" && node scripts\prepare-store-screenshots.mjs
+cd /d "%USERPROFILE%\Downloads\tamaya-server-setup\tamayaapp-main" && curl.exe -fL --retry 3 "https://raw.githubusercontent.com/iichi86/tamayaapp/4820d9c713d1a22897a49f7c341b4188d9090f28/scripts/prepare-store-screenshots.mjs" -o "scripts\prepare-store-screenshots.mjs" && node scripts\prepare-store-screenshots.mjs
 ```
 
 ファイル選択では、Appleへ追加しようとした画像3枚をCtrlキーを押しながら選び、「開く」を押します。生成後は`Tamaya-AppStore-日時-識別子`というデスクトップの固有フォルダーが開きます。その中のPNG3枚を現在のスクリーンショット欄へ追加し、ホーム→お店→利用条件の順に並べて保存します。元のファイルはそのまま残します。
 
-計算・入力検査・元ファイル保全・出力PNGの寸法と不透明RGB形式・失敗時の判定は、検証用の画像とWindows実行部を注入して確認しました。既存分を含むNodeテスト102件が成功しています。Linuxの作業環境では実際のWindowsのファイル選択・System.Drawing描画は実行していないため、所有者の実行結果とAppleの受入結果を次に確認します。
+初版ではWindowsの画像読み込み部で失敗し、PowerShellの進捗XMLも表示されるとの画面を受け取りました。画像処理をNodeへ移し、実際の画像コーデックで検証用PNG・JPEGの変換と出力画素・不透明RGB形式を確認する方式へ変更しました。既存分を含むNodeテスト109件が成功しました。PowerShellは画像を開かず、選択したパスだけを返します。進捗表示を抑え、標準エラーも明示的に捕捉します。選択用のスクリプトはPowerShell 7.5.4の実パーサーで構文を確認しました。Windowsの実ファイル選択と、所有者の3枚の実変換・Appleの受入は、次の実行で確認します。
 
 元画像が小さい場合、拡大で文字の細部を復元できるとは扱いません。変換時に元寸法・拡大率を表示し、保存後の画像とApple側の登録結果を確認します。画像登録・App Review承認が完了したことを示す処理ではありません。まだ所有者のWindowsでの実変換結果は確認していません。
 
