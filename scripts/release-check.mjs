@@ -10,6 +10,13 @@ try { if (new URL(process.env.EXPO_PUBLIC_API_URL).protocol !== 'https:') issues
 const bundle = process.env.EXPO_IOS_BUNDLE_IDENTIFIER ?? '';
 if (!/^[A-Za-z][A-Za-z0-9-]*(\.[A-Za-z0-9-]+){2,}$/.test(bundle) || bundle.includes('demo')) issues.push('正式な一意のiOS Bundle Identifierが必要');
 if (process.env.RELEASE_BUSINESS_APPROVED !== '1') issues.push('正式な運用条件・法的表示の運営者確認が必要（RELEASE_BUSINESS_APPROVED）');
+const app = JSON.parse(readFileSync(new URL('../app.json', import.meta.url), 'utf8')).expo;
+const cameraPlugins = (app.plugins ?? []).filter(plugin => (Array.isArray(plugin) ? plugin[0] : plugin) === 'expo-camera');
+const camera = cameraPlugins.length === 1 && Array.isArray(cameraPlugins[0]) ? cameraPlugins[0][1] : null;
+if (camera?.microphonePermission !== false || camera?.recordAudioAndroid !== false
+  || typeof camera?.cameraPermission !== 'string' || !camera.cameraPermission.includes('QR')) {
+  issues.push('QR読取り用のカメラ説明と、未使用のマイク権限の無効化が必要');
+}
 const store = JSON.parse(readFileSync(new URL('../server/config/tamaya.json', import.meta.url), 'utf8'));
 if (!store.reward.operationsEnabled || !store.reward.benefit || !store.reward.combinationRule) issues.push('特典内容と併用条件の確定・運用有効化が必要');
 if (!store.address || !store.phone || !store.informationSource) issues.push('店舗住所・電話番号を根拠付きで確認する必要があります');

@@ -135,6 +135,7 @@ test('the real release pre-install guard can execute using only the files retain
     legal: { termsVersion: 'fixture-1', privacyVersion: 'fixture-1', termsText: 'fixture terms', privacyText: 'fixture privacy' },
   };
   const output = await fixture(t, {
+    'app.json': await readFile(join(projectRoot, 'app.json'), 'utf8'),
     'scripts/release-check.mjs': await readFile(join(projectRoot, 'scripts', 'release-check.mjs'), 'utf8'),
     'server/config/tamaya.json': JSON.stringify(store),
   });
@@ -152,4 +153,12 @@ test('the real release pre-install guard can execute using only the files retain
   assert.equal(child.error, undefined);
   assert.equal(child.status, 0, child.stderr || child.stdout);
   assert.match(child.stdout, /設定チェック成功/);
+  const previous = JSON.parse(await readFile(join(output, 'app.json'), 'utf8'));
+  delete previous.expo.plugins.find(plugin => Array.isArray(plugin) && plugin[0] === 'expo-camera')[1].microphonePermission;
+  await writeFile(join(output, 'app.json'), JSON.stringify(previous));
+  const rejected = spawnSync(process.execPath, ['scripts/release-check.mjs', '--build'], {
+    cwd: output, env, encoding: 'utf8', timeout: 10_000,
+  });
+  assert.equal(rejected.status, 1);
+  assert.match(rejected.stderr, /マイク権限/);
 });

@@ -50,6 +50,8 @@ export function Scanner({
         <CameraView
           style={StyleSheet.absoluteFill}
           facing="back"
+          mode="picture"
+          mute
           onMountError={() => setError('カメラを使用できません。ほかのアプリを閉じてお試しください。会員番号の検索でも確認できます。')}
           barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
           onBarcodeScanned={({ data }) => {

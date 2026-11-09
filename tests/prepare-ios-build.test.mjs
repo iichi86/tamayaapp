@@ -9,7 +9,9 @@ import { BUNDLE_ID, PROJECT_ID, RELEASE_FILES, easArguments, prepareIosBuild, up
 
 const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
-const app = { expo: { owner: 'oneight', extra: { eas: { projectId: PROJECT_ID } } } };
+const app = { expo: { owner: 'oneight', extra: { eas: { projectId: PROJECT_ID } },
+  plugins: [['expo-camera', { cameraPermission: '会員QRコードの読取りに使用します。',
+    microphonePermission: false, recordAudioAndroid: false }]] } };
 const publicEnv = '# fixture\nEXPO_PUBLIC_APP_MODE=production\nEXPO_PUBLIC_API_URL=https://fixture.example.com\nEXPO_PUBLIC_FIREBASE_API_KEY=fixture-key\nEXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=fixture.example.com\nEXPO_PUBLIC_FIREBASE_PROJECT_ID=fixture-project\nEXPO_PUBLIC_FIREBASE_APP_ID=fixture-app\n';
 const env = publicEnv + `EAS_PROJECT_ID=${PROJECT_ID}\nEXPO_IOS_BUNDLE_IDENTIFIER=\nRELEASE_BUSINESS_APPROVED=0\nOTHER_PRIVATE_VALUE=do-not-print-or-change\n`;
 const store = { id: 'tamaya', address: 'fixture', phone: 'fixture', informationSource: 'fixture',
